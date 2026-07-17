@@ -72,11 +72,10 @@ lemma act_eq_of_agree {X : GSet} {s : Finset Atom} {x : X.V}
     X.act g x = X.act h x := by
   have key : ∀ a ∈ s, (h⁻¹ * g) a = a := by
     intro a ha
-    rw [Equiv.Perm.mul_apply, hgh a ha]; simp
-  have hx : X.act (h⁻¹ * g) x = x := hs _ key
+    simp [Equiv.Perm.mul_apply, hgh a ha]
   calc X.act g x = X.act (h * (h⁻¹ * g)) x := by rw [mul_inv_cancel_left]
     _ = X.act h (X.act (h⁻¹ * g) x) := GSet.act_mul X h (h⁻¹ * g) x
-    _ = X.act h x := by rw [hx]
+    _ = X.act h x := by rw [hs _ key]
 
 /-- Conjugation of a transposition through a permutation:
 `swap (π a) (π b) * π = π * swap a b`. -/
@@ -139,13 +138,10 @@ theorem AbsRel_smul {X : GSet} (π : PermAtom) {p q : Atom × X.V} (h : AbsRel X
   obtain ⟨s, hs⟩ := h
   refine ⟨s.image π, fun d hd => ?_⟩
   -- `d` outside `π '' s` means `π⁻¹ d ∉ s`
-  have hc : π⁻¹ d ∉ s := by
-    intro hmem
-    exact hd (by
-      have : π (π⁻¹ d) = d := by simp
-      simpa [this] using Finset.mem_image_of_mem π hmem)
-  have hkey := hs (π⁻¹ d) hc
   have hdc : π (π⁻¹ d) = d := by simp
+  have hc : π⁻¹ d ∉ s := fun hmem =>
+    hd (by simpa [hdc] using Finset.mem_image_of_mem π hmem)
+  have hkey := hs (π⁻¹ d) hc
   calc X.act (Equiv.swap (π p.1) d) (X.act π p.2)
       = X.act (Equiv.swap (π p.1) (π (π⁻¹ d)) * π) p.2 := by
         rw [hdc, ← GSet.act_mul]

@@ -57,9 +57,7 @@ lemma swapFin_apply_eq_self {X : GSetFin} {s : Finset CatCrypt.Nominal.Atom} {x 
     X.act (FinPerm.swap a b) x = x := by
   apply hs
   intro e he
-  have ea : e ≠ a := fun h => ha (h ▸ he)
-  have eb : e ≠ b := fun h => hb (h ▸ he)
-  exact FinPerm.swap_apply_of_ne_of_ne ea eb
+  exact FinPerm.swap_apply_of_ne_of_ne (fun h => ha (h ▸ he)) (fun h => hb (h ▸ he))
 
 /-! ## Step 1 — finite supports are closed under intersection (`FinPerm` side)
 
@@ -194,13 +192,11 @@ lemma suppFin_supports {X : GSetFin} (hX : IsNominalFin X) (x : X.V) :
 /-- The least support is contained in every support. -/
 lemma suppFin_le {X : GSetFin} (hX : IsNominalFin X) {x : X.V} {s : Finset CatCrypt.Nominal.Atom}
     (hsupp : SupportsFin X s x) : suppFin hX x ⊆ s := by
-  have hs0 : SupportsFin X (hX x).choose x := (hX x).choose_spec
   have hmem : s ∩ (hX x).choose ∈
       (hX x).choose.powerset.filter (fun u => SupportsFin X u x) := by
     rw [Finset.mem_filter, Finset.mem_powerset]
-    exact ⟨Finset.inter_subset_right, supportsFin_inter hsupp hs0⟩
-  have hle : suppFin hX x ⊆ s ∩ (hX x).choose := Finset.inf'_le (f := id) hmem
-  exact hle.trans Finset.inter_subset_left
+    exact ⟨Finset.inter_subset_right, supportsFin_inter hsupp (hX x).choose_spec⟩
+  exact (Finset.inf'_le (f := id) hmem).trans Finset.inter_subset_left
 
 /-- Equivariance of `SupportsFin`: if `s` supports `x` then `s.image τ` supports `X.act τ x`. The
 `FinPerm`-side mirror of `Nominal.Supports.smul`. -/
@@ -338,7 +334,7 @@ noncomputable def extResGSetIso (A : Nom) :
     (by
       intro π
       apply ConcreteCategory.hom_ext; intro x
-      simp only [Iso.refl_hom, Category.comp_id, Category.id_comp]
+      simp only [Iso.refl_hom]
       show A.obj.act (finPermToPerm
           (extendPerm (fromPermℕ π) (suppFin (res.obj A).property x))) x = A.obj.act π x
       have hsupp :

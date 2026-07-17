@@ -91,10 +91,7 @@ theorem fresh_act_of_fresh {α : Type*} [NomSet α] (π : FinPerm) (c : Atom) (x
   intro hmem
   rw [NomSet.supp_act_eq_image, Finset.mem_image] at hmem
   obtain ⟨a, ha, hae⟩ := hmem
-  have hac : a = c := by
-    have := π.val.injective (show π.val a = π.val c from by exact_mod_cast hae)
-    exact this
-  exact h (hac ▸ ha)
+  exact h (π.val.injective (show π.val a = π.val c from by exact_mod_cast hae) ▸ ha)
 
 /-! ## Section 1: Swap Conjugation -/
 
@@ -209,7 +206,7 @@ end AbsRel
 /-- The setoid for name abstraction. -/
 def absRel_setoid (α : Type*) [NomSet α] : Setoid (Atom × α) where
   r := AbsRel
-  iseqv := ⟨AbsRel.refl, fun h => AbsRel.symm h, fun h1 h2 => AbsRel.trans h1 h2⟩
+  iseqv := ⟨AbsRel.refl, AbsRel.symm, AbsRel.trans⟩
 
 /-! ## Section 3: NameAbs Quotient Type -/
 
@@ -384,11 +381,8 @@ noncomputable instance instNomSetNameAbs {α : Type*} [NomSet α] :
         rw [show π.apply p.1 = π • p.1 from rfl, FinPerm.swap_apply_left]
       · have hπa := hπ_fix a ha ha_p1
         rw [hπa, FinPerm.swap_apply_of_ne_of_ne ha_p1 ha_ne_c]
-        have ha_ne_πp1 : a ≠ π p.1 := by
-          intro heq; apply ha_p1
-          have h1 : π.val a = a := by rw [show π.val a = π a from rfl]; exact hπa
-          have h2 : π.val p.1 = a := by rw [show π.val p.1 = π p.1 from rfl]; exact heq.symm
-          exact π.val.injective (h1.trans h2.symm)
+        have ha_ne_πp1 : a ≠ π p.1 := fun heq =>
+          ha_p1 (π.val.injective (show π.val a = π.val p.1 from hπa.trans heq))
         exact FinPerm.swap_apply_of_ne_of_ne ha_ne_πp1 ha_ne_c
   supp_equivariant := fun q π => Quotient.inductionOn q fun p => by
     simp only [HSMul.hSMul, SMul.smul, Quotient.map_mk, Quotient.lift_mk]
@@ -438,9 +432,7 @@ private theorem concretize_wd {α : Type*} [NomSet α] (a : Atom) {p q : Atom ×
     by_cases haq : a = a₂
     · subst haq -- a₂ eliminated, replaced by a
       rw [FinPerm.swap_self, one_smul]
-      have := congr_arg ((FinPerm.swap a c)⁻¹ • ·) heq
-      simp only [inv_smul_smul] at this
-      exact this
+      simpa only [inv_smul_smul] using congr_arg ((FinPerm.swap a c)⁻¹ • ·) heq
     · have ha_not_x₂ : a ∉ NomSet.supp x₂ := fun h => haq (ha_q h)
       have h1 : x₁ = FinPerm.swap a c • (FinPerm.swap a₂ c • x₂) := by
         rw [← heq, ← mul_smul, FinPerm.swap_swap, one_smul]
@@ -489,11 +481,7 @@ theorem concretize_abs {α : Type*} [NomSet α] (a b : Atom) (x : α)
   unfold concretize
   have hrel : AbsRel (abs b x).out (b, x) :=
     Quotient.mk_out (s := absRel_setoid α) (b, x)
-  exact concretize_wd a hrel (by
-    have hsup : absSupp (abs b x).out = absSupp (b, x) := absSupp_eq_of_absRel hrel
-    rw [hsup]
-    show a ∉ absSupp (b, x)
-    exact ha)
+  exact concretize_wd a hrel (by rw [absSupp_eq_of_absRel hrel]; exact ha)
 
 /-- Concretize applied to an abstraction where `a` matches. -/
 theorem concretize_abs_self {α : Type*} [NomSet α] (a : Atom) (x : α)

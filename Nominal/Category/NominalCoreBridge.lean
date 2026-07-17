@@ -158,11 +158,8 @@ theorem nomSet_act_eq_of_agree {α : Type*} [NomSet α]
       simp only [FinPerm.mul_apply]; rw [← h a ha]
     rw [e, inv_mul_cancel, FinPerm.one_apply]
   have hact := hsupp (τ₁⁻¹ * τ₂) hfix
-  have key : τ₂ • x = τ₁ • x := by
-    calc τ₂ • x = (τ₁ * (τ₁⁻¹ * τ₂)) • x := by rw [← mul_assoc, mul_inv_cancel, one_mul]
-      _ = τ₁ • ((τ₁⁻¹ * τ₂) • x) := mul_smul _ _ _
-      _ = τ₁ • x := by rw [hact]
-  exact key.symm
+  rw [show τ₂ • x = τ₁ • ((τ₁⁻¹ * τ₂) • x) by
+        rw [← mul_smul, ← mul_assoc, mul_inv_cancel, one_mul], hact]
 
 open CatCrypt.Nominal in
 /-- The reconstructed full-`Perm` action on a core nominal set: act by any finitely-supported
@@ -185,7 +182,7 @@ open CatCrypt.Nominal in
 theorem fullSmul_mul {α : Type*} [NomSet α]
     (π σ : Equiv.Perm CatCrypt.Nominal.Atom) (x : α) :
     fullSmul (π * σ) x = fullSmul π (fullSmul σ x) := by
-  set σ' := extendPerm σ (NomSet.supp x) with hσ'
+  set σ' := extendPerm σ (NomSet.supp x)
   show extendPerm (π * σ) (NomSet.supp x) • x
       = extendPerm π (NomSet.supp (σ' • x)) • (σ' • x)
   rw [← mul_smul]
@@ -234,9 +231,7 @@ theorem coreToGSet_supports (α : Type) [NomSet α] (x : α) :
   intro π hπ
   show fullSmul (fromPermℕ π) x = x
   refine fullSmul_eq_self_of_fixes (fun b hb => ?_)
-  have hmem : coreAtomEquiv b ∈ (NomSet.supp x).image coreAtomEquiv :=
-    Finset.mem_image_of_mem _ hb
-  have hfix := hπ (coreAtomEquiv b) hmem
+  have hfix := hπ (coreAtomEquiv b) (Finset.mem_image_of_mem _ hb)
   simp [fromPermℕ, Equiv.permCongr_apply, hfix]
 
 open CatCrypt.Nominal in

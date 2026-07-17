@@ -80,7 +80,7 @@ theorem atomShift_injective (base : ℕ) : Function.Injective (atomShift base) :
   simp only [atomShift, Atom.mk.injEq] at h
   exact Atom.ext (Nat.add_left_cancel h)
 
-theorem atomShift_image_disjoint {s : Finset Atom} {a : Atom} (ha : a ∈ s) (base : ℕ)
+theorem atomShift_image_disjoint {s : Finset Atom} {a : Atom} (_ha : a ∈ s) (base : ℕ)
     (hbase : Atom.offset s ≤ base) : atomShift base a ∉ s := by
   intro hmem
   have hlt := Atom.fresh_val_gt hmem
@@ -155,7 +155,7 @@ theorem foldl_mul_swap_fix {a : Atom} {init : FinPerm} (l : List Atom) (base : �
 
 /-- freshPerm fixes atoms outside s when base ≥ offset s -/
 theorem freshPerm_fix_outside {s : Finset Atom} {base : ℕ} {a : Atom}
-    (hbase : Atom.offset s ≤ base) (ha : a ∉ s)
+    (_hbase : Atom.offset s ≤ base) (ha : a ∉ s)
     (hshift : ∀ b ∈ s, atomShift base b ≠ a) :
     freshPerm s base a = a := by
   unfold freshPerm
@@ -180,11 +180,7 @@ theorem foldl_mul_swap_transparent {x : Atom} {init : FinPerm} (l : List Atom) (
     have hys : ∀ z ∈ ys, x ≠ z ∧ x ≠ atomShift base z :=
       fun z hz => hswaps z (List.mem_cons_of_mem y hz)
     -- (init * swap y (shift y)) x = init (swap y (shift y) x) = init x
-    have hnew_init : (init * FinPerm.swap y (atomShift base y)) x = init x := by
-      simp only [FinPerm.mul_apply]
-      simp only [FinPerm.swap_apply_of_ne_of_ne hy.1 hy.2]
-    rw [ih hys]
-    exact hnew_init
+    rw [ih hys, FinPerm.mul_apply, FinPerm.swap_apply_of_ne_of_ne hy.1 hy.2]
 
 /-- Helper for freshPerm_apply_mem': when a is in the list, the fold maps a to its shift.
     Key invariants: init fixes a, and init fixes atomShift base a. -/
@@ -217,11 +213,9 @@ theorem foldl_mul_swap_apply_mem {a : Atom} {init : FinPerm} (l : List Atom) (ba
           -- heq' : a = atomShift base y, but we need (atomShift base a).val ≠ y.val
           -- This should be impossible since a.val < base ≤ (atomShift base y).val
           -- So heq' should contradict something
-          have h1 : a.val < (atomShift base y).val := by
-            have h := hbefore y (List.mem_cons_of_mem a hy) hy_ne
-            exact h
+          have h1 := hbefore y (List.mem_cons_of_mem a hy) hy_ne
           rw [heq'] at h1
-          exact absurd (le_refl _) (Nat.not_le.mpr h1)
+          omega
       -- Use foldl_mul_swap_transparent: fold result at a equals (init * swap a (shift a)) a
       rw [foldl_mul_swap_transparent xs base hxs_fix_a]
       -- Now just compute (init * swap a (shift a)) a = init (shift a) = shift a
@@ -338,8 +332,6 @@ theorem move_disj {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : β) :
     · -- Both nonempty: x nonempty and union nonempty
       have hsub : NomSet.supp x ⊆ NomSet.supp x ∪ NomSet.supp y := Finset.subset_union_left
       -- For any a in supp x, a.val ≤ sup' (supp x) ≤ sup' (supp x ∪ supp y)
-      have hunion : h1.choose ∈ NomSet.supp x ∪ NomSet.supp y :=
-        hsub h1.choose_spec
       have hle_x : (NomSet.supp x).sup' h1 Atom.val ≤ (NomSet.supp x ∪ NomSet.supp y).sup' h2 Atom.val := by
         apply Finset.sup'_le h1
         intro a ha
@@ -397,10 +389,9 @@ theorem movePerm_act_left {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : 
     · omega
   · exact ha_not_y
   · -- a is not a shift target: ∀ b ∈ supp y, atomShift base b ≠ a
-    intro b hb
     -- atomShift base b has value ≥ base = offset (supp x ∪ supp y)
     -- a ∈ supp x has value < offset (supp x ∪ supp y)
-    intro heq
+    intro b hb heq
     have ha_mem : a ∈ NomSet.supp x ∪ NomSet.supp y := Finset.mem_union_left _ ha
     have ha_lt : a.val < Atom.offset (NomSet.supp x ∪ NomSet.supp y) := atom_val_lt_offset ha_mem
     have hshift_ge : (atomShift (Atom.offset (NomSet.supp x ∪ NomSet.supp y)) b).val ≥

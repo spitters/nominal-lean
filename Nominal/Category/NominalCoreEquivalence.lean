@@ -117,9 +117,7 @@ lemma act_eq_of_supports {X : GSet} {s : Finset Nominal.Atom} {x : X.V}
     X.act π₁ x = X.act π₂ x := by
   have hfix : ∀ a ∈ s, (π₁⁻¹ * π₂) a = a := by
     intro a ha
-    simp only [Equiv.Perm.mul_apply]
-    rw [← h a ha]
-    simp
+    simp [Equiv.Perm.mul_apply, ← h a ha]
   have key := hs (π₁⁻¹ * π₂) hfix
   calc X.act π₁ x
       = X.act π₁ (X.act (π₁⁻¹ * π₂) x) := by rw [key]
@@ -236,12 +234,11 @@ lemma actFin_eq_of_agree {X : GSetFin} {τ₁ τ₂ : CatCrypt.Nominal.FinPerm}
       simp only [CatCrypt.Nominal.FinPerm.mul_apply]; rw [← h a ha]
     rw [e, inv_mul_cancel, CatCrypt.Nominal.FinPerm.one_apply]
   have key := hsupp (τ₁⁻¹ * τ₂) hfix
-  have : X.act τ₂ x = X.act τ₁ x := by
-    calc X.act τ₂ x
-        = X.act (τ₁ * (τ₁⁻¹ * τ₂)) x := by rw [← mul_assoc, mul_inv_cancel, one_mul]
-      _ = X.act τ₁ (X.act (τ₁⁻¹ * τ₂) x) := GSetFin.act_mul X _ _ x
-      _ = X.act τ₁ x := by rw [key]
-  exact this.symm
+  symm
+  calc X.act τ₂ x
+      = X.act (τ₁ * (τ₁⁻¹ * τ₂)) x := by rw [← mul_assoc, mul_inv_cancel, one_mul]
+    _ = X.act τ₁ (X.act (τ₁⁻¹ * τ₂) x) := GSetFin.act_mul X _ _ x
+    _ = X.act τ₁ x := by rw [key]
 
 /-- The reconstructed full-`PermAtom` action on a finitely-supported `FinPerm`-set with an
 equivariant support function: act by any finitely-supported permutation agreeing with `π` on the
@@ -354,7 +351,7 @@ noncomputable def resExtGSetIso (X : GSetFin) (suppOf : X.V → Finset CatCrypt.
     (by
       intro τ
       apply ConcreteCategory.hom_ext; intro x
-      simp only [Iso.refl_hom, Category.comp_id, Category.id_comp]
+      simp only [Iso.refl_hom]
       show X.act (extendPerm (fromPermℕ (finPermToPerm τ)) (suppOf x)) x = X.act τ x
       rw [fromPermℕ_finPermToPerm]
       refine actFin_eq_of_agree (hsupp x) ?_

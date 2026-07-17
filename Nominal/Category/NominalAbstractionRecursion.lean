@@ -191,9 +191,8 @@ lemma absRel_core_to_cat {p q : CatCrypt.Nominal.Atom × β}
   intro d hd
   set d0 := coreAtomEquiv.symm d with hd0
   have hdd0 : coreAtomEquiv d0 = d := coreAtomEquiv.apply_symm_apply d
-  have hns : d0 ∉ (NomSet.supp x ∪ NomSet.supp x' ∪ {a, a'}) := by
-    intro hmem
-    exact hd (by rw [← hdd0]; exact Finset.mem_image_of_mem _ hmem)
+  have hns : d0 ∉ (NomSet.supp x ∪ NomSet.supp x' ∪ {a, a'}) :=
+    fun hmem => hd (by rw [← hdd0]; exact Finset.mem_image_of_mem _ hmem)
   simp only [Finset.mem_union, Finset.mem_insert, Finset.mem_singleton, not_or] at hns
   obtain ⟨⟨hx, hx'⟩, ha, ha'⟩ := hns
   show (coreToNom β).obj.act (Equiv.swap (coreAtomEquiv a) d) x
@@ -212,17 +211,13 @@ lemma absRel_cat_to_core {p q : Atom × β}
   obtain ⟨s, hs⟩ := h
   set S := NomSet.supp x ∪ NomSet.supp x' ∪ {coreAtomEquiv.symm n, coreAtomEquiv.symm n'}
       ∪ s.image coreAtomEquiv.symm with hSdef
-  set c := CatCrypt.Nominal.Atom.fresh S with hcdef
+  set c := CatCrypt.Nominal.Atom.fresh S
   have hc : c ∉ S := CatCrypt.Nominal.Atom.fresh_not_mem S
   rw [hSdef] at hc
   simp only [Finset.mem_union, Finset.mem_insert, Finset.mem_singleton, not_or] at hc
   obtain ⟨⟨⟨hx, hx'⟩, hn, hn'⟩, himg⟩ := hc
-  have hcs : coreAtomEquiv c ∉ s := by
-    intro hmem
-    apply himg
-    have hmem2 : coreAtomEquiv.symm (coreAtomEquiv c) ∈ s.image coreAtomEquiv.symm :=
-      Finset.mem_image_of_mem _ hmem
-    rwa [coreAtomEquiv.symm_apply_apply] at hmem2
+  have hcs : coreAtomEquiv c ∉ s := fun hmem =>
+    himg (by simpa using Finset.mem_image_of_mem coreAtomEquiv.symm hmem)
   have hswap := hs (coreAtomEquiv c) hcs
   rw [show n = coreAtomEquiv (coreAtomEquiv.symm n) from (coreAtomEquiv.apply_symm_apply n).symm,
       show n' = coreAtomEquiv (coreAtomEquiv.symm n') from (coreAtomEquiv.apply_symm_apply n').symm,

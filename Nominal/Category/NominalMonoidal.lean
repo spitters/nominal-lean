@@ -53,12 +53,8 @@ lemma Supports.mono {A : GSet} {s s' : Finset Atom} {x : A.V}
 /-- A permutation swapping two atoms both **outside** a support fixes the supported element. -/
 lemma swap_apply_eq_self {A : GSet} {s : Finset Atom} {x : A.V}
     (hs : Supports A s x) {a b : Atom} (ha : a ∉ s) (hb : b ∉ s) :
-    A.act (Equiv.swap a b) x = x := by
-  apply hs
-  intro e he
-  have ea : e ≠ a := fun h => ha (h ▸ he)
-  have eb : e ≠ b := fun h => hb (h ▸ he)
-  exact Equiv.swap_apply_of_ne_of_ne ea eb
+    A.act (Equiv.swap a b) x = x :=
+  hs _ fun _ he => Equiv.swap_apply_of_ne_of_ne (fun h => ha (h ▸ he)) (fun h => hb (h ▸ he))
 
 /-- **Erase step** for the intersection theorem: if `s` and `t` both support `x` and `a ∈ s`,
 `a ∉ t`, then `x` is already supported by `s.erase a`. This is the single-atom fresh-renaming

@@ -63,13 +63,8 @@ theorem val_injective : Function.Injective (Subtype.val : FinPerm → Perm Atom)
   Subtype.val_injective
 
 @[ext]
-theorem ext {π₁ π₂ : FinPerm} (h : ∀ a, π₁ a = π₂ a) : π₁ = π₂ := by
-  apply val_injective
-  apply Perm.ext
-  intro a
-  have := h a
-  simp only [apply_def] at this
-  exact this
+theorem ext {π₁ π₂ : FinPerm} (h : ∀ a, π₁ a = π₂ a) : π₁ = π₂ :=
+  val_injective (Perm.ext h)
 
 /-- A witness of finite support for a permutation -/
 noncomputable def suppWitness (π : FinPerm) : Finset Atom :=
@@ -167,20 +162,11 @@ theorem swap_comm (a b : Atom) : swap a b = swap b a := by
   ext c; simp [Equiv.swap_comm]
 
 theorem swap_swap (a b : Atom) : swap a b * swap a b = 1 := by
-  apply val_injective
-  apply Perm.ext
-  intro c
-  simp only [mul_val, one_val, Perm.coe_mul, Function.comp_apply, swap_val]
-  exact Equiv.swap_apply_self a b c
+  ext c; simp
 
 @[simp]
-theorem swap_inv (a b : Atom) : (swap a b)⁻¹ = swap a b := by
-  have h := swap_swap a b
-  calc (swap a b)⁻¹ = (swap a b)⁻¹ * 1 := by rw [mul_one]
-    _ = (swap a b)⁻¹ * (swap a b * swap a b) := by rw [h]
-    _ = ((swap a b)⁻¹ * swap a b) * swap a b := by rw [mul_assoc]
-    _ = 1 * swap a b := by rw [inv_mul_cancel]
-    _ = swap a b := by rw [one_mul]
+theorem swap_inv (a b : Atom) : (swap a b)⁻¹ = swap a b :=
+  inv_eq_of_mul_eq_one_right (swap_swap a b)
 
 end FinPerm
 

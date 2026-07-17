@@ -97,11 +97,7 @@ def funGSet (A B : GSet) : GSet where
 /-- The internal-hom `G`-set is nominal: each element carries its finite-support witness. -/
 lemma funGSet_isNominal (A B : GSet) : IsNominal (funGSet A B) := by
   rintro ⟨f, s, hs⟩
-  refine ⟨s, ?_⟩
-  intro π hπ
-  apply Subtype.ext
-  show (funGSetFull A B).act π f = f
-  exact hs π hπ
+  exact ⟨s, fun π hπ => Subtype.ext (hs π hπ)⟩
 
 /-- The internal-hom object `funObj B C : Nom`. -/
 def funObj (B C : Nom) : Nom :=

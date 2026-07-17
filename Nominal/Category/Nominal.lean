@@ -106,12 +106,11 @@ lemma Supports.smul {X : GSet} {s : Finset Atom} {x : X.V}
     have hmem : π a ∈ s.image π := Finset.mem_image_of_mem π ha
     have hfix : σ (π a) = π a := hσ (π a) hmem
     simp [Equiv.Perm.mul_apply, hfix]
-  have hx : X.act (π⁻¹ * σ * π) x = x := h _ key
   have e : σ * π = π * (π⁻¹ * σ * π) := by group
   calc X.act σ (X.act π x) = X.act (σ * π) x := (GSet.act_mul X σ π x).symm
     _ = X.act (π * (π⁻¹ * σ * π)) x := by rw [e]
     _ = X.act π (X.act (π⁻¹ * σ * π) x) := GSet.act_mul X _ _ x
-    _ = X.act π x := by rw [hx]
+    _ = X.act π x := by rw [h _ key]
 
 /-- An element has finite support if some finite set supports it. -/
 def HasFinSupport (X : GSet) (x : X.V) : Prop := ∃ s : Finset Atom, Supports X s x
@@ -134,8 +133,7 @@ example : Category Nom := inferInstance
 `𝟙ₙ`. Its single element is supported by `∅`. -/
 def unitGSet : GSet := Action.trivial PermAtom PUnit
 
-lemma unitGSet_isNominal : IsNominal unitGSet := by
-  intro x; exact ⟨∅, by intro π _; rfl⟩
+lemma unitGSet_isNominal : IsNominal unitGSet := fun _ => ⟨∅, fun _ _ => rfl⟩
 
 /-- The monoidal unit `𝟙ₙ` of `Nom`. -/
 def unitObj : Nom := Nom.of unitGSet unitGSet_isNominal
@@ -152,11 +150,8 @@ def atomGSet : GSet where
       map_mul' := fun a b => by
         apply ConcreteCategory.hom_ext; intro x; rfl }
 
-lemma atomGSet_isNominal : IsNominal atomGSet := by
-  intro a
-  refine ⟨{a}, ?_⟩
-  intro π hπ
-  exact hπ a (Finset.mem_singleton_self a)
+lemma atomGSet_isNominal : IsNominal atomGSet :=
+  fun a => ⟨{a}, fun _ hπ => hπ a (Finset.mem_singleton_self a)⟩
 
 /-- The nominal set of atoms `𝔸`. -/
 def atomObj : Nom := Nom.of atomGSet atomGSet_isNominal

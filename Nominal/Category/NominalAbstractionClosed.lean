@@ -207,10 +207,8 @@ lemma absToExpFn_injective (X : Nom) : Function.Injective (absToExpFn X) := by
   intro X1 X2
   refine Quotient.inductionOn₂ X1 X2 ?_
   intro p q hX
-  have hX' : Quotient.mk (freshAgreeSetoid atomObj X) (absToExpCarrier X p.1 p.2)
-      = Quotient.mk (freshAgreeSetoid atomObj X) (absToExpCarrier X q.1 q.2) := hX
   have hfa : freshAgree atomObj X (absToExpCarrier X p.1 p.2) (absToExpCarrier X q.1 q.2) :=
-    Quotient.exact hX'
+    Quotient.exact hX
   apply Quotient.sound
   show AbsRel X.obj p q
   refine ⟨fsupp atomObj X (absToExpCarrier X p.1 p.2)

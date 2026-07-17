@@ -146,10 +146,7 @@ lemma curryFn_hasFinSupp (g : A ⊗ₙ B ⟶ C) (a : A.obj.V) :
       have key := curry_sep_transport g a hπa hsep'
         (show Separated A.obj B.obj a (B.obj.act π (B.obj.act π⁻¹ b)) by rw [hb]; exact hsep)
       rw [← key]
-      apply congrArg g.hom.hom
-      apply Subtype.ext
-      show (a, B.obj.act π (B.obj.act π⁻¹ b)) = (a, b)
-      rw [hb]
+      exact congrArg g.hom.hom (Subtype.ext (congrArg (Prod.mk a) hb))
     · have hsep' : ¬ Separated A.obj B.obj a (B.obj.act π⁻¹ b) := by
         intro h
         exact hsep ((sep_smul_iff_of_fix (perm_inv_fix hπa)).mp h)
@@ -225,10 +222,7 @@ lemma curryElt_class_supp (g : A ⊗ₙ B ⟶ C) (a : A.obj.V) :
   have key := curry_sep_transport g a hπ hsep'
     (show Separated A.obj B.obj a (B.obj.act π (B.obj.act π⁻¹ b)) by rw [hb]; exact hsep)
   rw [← key]
-  apply congrArg g.hom.hom
-  apply Subtype.ext
-  show (a, B.obj.act π (B.obj.act π⁻¹ b)) = (a, b)
-  rw [hb]
+  exact congrArg g.hom.hom (Subtype.ext (congrArg (Prod.mk a) hb))
 
 /-- Underlying equivariant map of the quotient currying `A ⟶ B ⊸ₛ C`. -/
 noncomputable def curryQActionHom (g : A ⊗ₙ B ⟶ C) : A.obj ⟶ (B ⊸ₛ C).obj where
@@ -317,10 +311,7 @@ theorem uncurryQ_curryQ (g : A ⊗ₙ B ⟶ C) : uncurryQ (curryQ g) = g := by
   have key := curry_sep_transport g a hσfix hsepσ'
     (show Separated A.obj B.obj a (B.obj.act σ (B.obj.act σ⁻¹ b)) by rw [hb]; exact hsep)
   rw [← key]
-  apply congrArg g.hom.hom
-  apply Subtype.ext
-  show (a, B.obj.act σ (B.obj.act σ⁻¹ b)) = (a, b)
-  rw [hb]
+  exact congrArg g.hom.hom (Subtype.ext (congrArg (Prod.mk a) hb))
 
 /-- **The inverse round-trip.**  `curryQ (uncurryQ h) = h`, from `uncurryQ_injective` and the β-rule.
 -/

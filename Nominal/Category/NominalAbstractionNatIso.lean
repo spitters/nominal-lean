@@ -91,9 +91,8 @@ variable {X : GSetFin}
 theorem refl (p : CatCrypt.Nominal.Atom × X.V) : AbsRelFin X p p := ⟨∅, fun _ _ => rfl⟩
 
 /-- Symmetry. -/
-theorem symm {p q : CatCrypt.Nominal.Atom × X.V} (h : AbsRelFin X p q) : AbsRelFin X q p := by
-  obtain ⟨s, hs⟩ := h
-  exact ⟨s, fun c hc => (hs c hc).symm⟩
+theorem symm {p q : CatCrypt.Nominal.Atom × X.V} (h : AbsRelFin X p q) : AbsRelFin X q p :=
+  h.imp fun _ hs c hc => (hs c hc).symm
 
 /-- Transitivity. -/
 theorem trans {p q r : CatCrypt.Nominal.Atom × X.V}

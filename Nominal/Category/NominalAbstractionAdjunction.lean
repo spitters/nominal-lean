@@ -74,12 +74,9 @@ variable {X : GSet}
 /-- Injectivity of the abstraction point in its body, for a fixed head atom:
 `⟦(a, y)⟧ = ⟦(a, y')⟧ → y = y'`. -/
 lemma absPt_inj_body {a : Atom} {y y' : X.V} (h : absPt X a y = absPt X a y') : y = y' := by
-  have hrel : AbsRel X (a, y) (a, y') := Quotient.exact h
-  obtain ⟨s, hs⟩ := hrel
+  obtain ⟨s, hs⟩ : AbsRel X (a, y) (a, y') := Quotient.exact h
   obtain ⟨c, hc⟩ := Infinite.exists_notMem_finset s
-  have e : X.act (Equiv.swap a c) y = X.act (Equiv.swap a c) y' := hs c hc
-  have e2 : X.act (Equiv.swap a c) (X.act (Equiv.swap a c) y)
-      = X.act (Equiv.swap a c) (X.act (Equiv.swap a c) y') := by rw [e]
+  have e2 := congrArg (X.act (Equiv.swap a c)) (hs c hc)
   rwa [← GSet.act_mul, ← GSet.act_mul, Equiv.swap_mul_self, GSet.act_one, GSet.act_one] at e2
 
 /-- One inclusion of least-support equivariance. -/
@@ -99,8 +96,7 @@ lemma supp_smul {A : GSet} (hA : IsNominal A) (π : PermAtom) (x : A.V) :
   have hz' := h1 hz
   rw [Finset.mem_image] at hz'
   obtain ⟨w, hw, hwz⟩ := hz'
-  have : (π : Atom → Atom) z = w := by rw [← hwz]; simp
-  rw [this]; exact hw
+  rwa [show (π : Atom → Atom) z = w by rw [← hwz]; simp]
 
 /-- Computation of the atom-object action. -/
 @[simp] lemma atomGSet_ρ_apply (π : PermAtom) (a : Atom) : atomGSet.act π a = π a := rfl
@@ -120,7 +116,7 @@ lemma atom_mem_of_supports {s : Finset Atom} {a : Atom}
   have hfix : atomGSet.act (Equiv.swap a e) a = a :=
     h _ (fun d hd => Equiv.swap_apply_of_ne_of_ne
       (fun h' => ha (h' ▸ hd)) (fun h' => hes (h' ▸ hd)))
-  rw [show atomGSet.act (Equiv.swap a e) a = Equiv.swap a e a from rfl, Equiv.swap_apply_left] at hfix
+  rw [atomGSet_ρ_apply, Equiv.swap_apply_left] at hfix
   exact hea hfix
 
 /-- Freshness of the head atom for a separated pair `(a, y)` in `𝔸 ⊗ₙ Y`: `a` is fresh for `y`. -/
@@ -292,8 +288,8 @@ lemma unitVal_equivariant {A : Nom} (π : PermAtom) (x : A.obj.V) :
     exact hfx (π.injective hceq ▸ hc)
   rw [unitVal_eq hπfresh]
   have hpair : (sepGSet atomGSet A.obj).act π ⟨(freshFor A x, x), sep_atom_of_fresh hfx⟩
-      = (⟨(π (freshFor A x), A.obj.act π x), sep_atom_of_fresh hπfresh⟩ : sepCarrier atomGSet A.obj) := by
-    apply Subtype.ext; rfl
+      = (⟨(π (freshFor A x), A.obj.act π x), sep_atom_of_fresh hπfresh⟩ : sepCarrier atomGSet A.obj) :=
+    Subtype.ext rfl
   rw [hpair]
 
 /-- The underlying `GSet` morphism of the unit. -/
