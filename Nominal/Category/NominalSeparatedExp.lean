@@ -41,15 +41,13 @@ open CategoryTheory
 
 open scoped Classical
 
-set_option maxHeartbeats 1000000
-
 namespace Nominal
 
 /-- Group-inverse cancellation as function application: `π (π⁻¹ x) = x`. -/
 private lemma perm_apply_inv (π : PermAtom) (x : Atom) : π (π⁻¹ x) = x := by
   rw [← Equiv.Perm.mul_apply, mul_inv_cancel, Equiv.Perm.one_apply]
 
-/-! ## Freshness / avoidance -/
+/-! ### Freshness and avoidance -/
 
 /-- **Avoidance / fresh renaming.**  Given a `Fix`ed finite set, a set `Avoid` to steer clear of,
 and a `Move` set disjoint from `Fix`, there is a permutation fixing `Fix` pointwise that carries
@@ -93,7 +91,7 @@ lemma exists_avoiding_perm (Fix Avoid : Finset Atom) :
           fun h => hcImg (Finset.mem_image.mpr ⟨x, Finset.mem_insert_of_mem hxM, h⟩)
         rw [Equiv.swap_apply_of_ne_of_ne hne1 hne2]; exact hσx
 
-/-! ## Equivariance of least support -/
+/-! ### Equivariance of least support -/
 
 /-- The least support is equivariant: `supp (ρ π x) = (supp x).image π`. -/
 lemma supp_smul {A : GSet} (hA : IsNominal A) (π : PermAtom) (x : A.V) :
@@ -136,7 +134,7 @@ lemma disjoint_image_perm {S T : Finset Atom} {π : PermAtom}
   rw [hπx] at hmem
   exact Finset.disjoint_left.mp h hmem htT
 
-/-! ## The fresh-agreement equivalence -/
+/-! ### The fresh-agreement equivalence -/
 
 /-- Least support of a finitely supported function, as an element of the internal-hom nominal set
 `funGSet B C`. -/
@@ -250,7 +248,7 @@ def freshAgreeSetoid (B C : Nom) : Setoid (funCarrier B.obj C.obj) where
   r := freshAgree B C
   iseqv := ⟨freshAgree_refl B C, freshAgree_symm, freshAgree_trans⟩
 
-/-! ## The separated exponential object `B ⊸ₛ C` -/
+/-! ### The separated exponential object `B ⊸ₛ C` -/
 
 /-- Carrier of the separated exponential: fresh-agreement classes of finitely supported functions. -/
 def sepExpCarrier (B C : Nom) : Type := Quotient (freshAgreeSetoid B C)
@@ -318,7 +316,7 @@ lemma disjoint_image_image {S T : Finset Atom} (π : PermAtom) (hd : Disjoint S 
   subst hxx
   exact Finset.disjoint_left.mp hd hx hx'
 
-/-! ## Step 3 — the separated evaluation and `uncurryQ`
+/-! ### Step 3 — the separated evaluation and `uncurryQ`
 
 To transpose a morphism `h : A ⟶ B ⊸ₛ C` into `A ⊗ₙ B ⟶ C` we must evaluate the class `h a` at a
 separated argument `b`.  Because `uncurry_not_injective` shows evaluation of an *arbitrary*
@@ -475,7 +473,7 @@ theorem uncurryQ_injective {A B C : Nom} {h h' : A ⟶ B ⊸ₛ C}
   have hcancel := congrArg (C.obj.act π⁻¹) hval''
   rwa [← GSet.act_mul, ← GSet.act_mul, inv_mul_cancel, GSet.act_one, GSet.act_one] at hcancel
 
-/-! ## Step 3 — `uncurry` factors through fresh agreement
+/-! ### Step 3, continued — `uncurry` factors through fresh agreement
 
 The transpose `uncurry` into the *total*-function hom `funObj` inspects only separated pairs; two
 morphisms whose pointwise images are fresh-agreement equivalent therefore have equal uncurryings.
@@ -503,7 +501,7 @@ lemma uncurry_respects_freshAgree {A B C : Nom} (h h' : A ⟶ B ⊸ₙ C)
     supp_le (funGSet_isNominal B.obj C.obj) (Supports.map h'.hom (supp_supports A.property a))
   exact hab.mono_left (Finset.union_subset hha hh'a)
 
-/-! ## Step 4 — the adjunction and `MonoidalClosed Nom`
+/-! ### Step 4 — the adjunction and `MonoidalClosed Nom`
 
 What is established here, axiom-cleanly (`propext`, `Classical.choice`, `Quot.sound` only):
 

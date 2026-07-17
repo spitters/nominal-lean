@@ -35,7 +35,7 @@ the nominal analogue of alpha-equivalence for binders.
 
 namespace CatCrypt.Nominal
 
-/-! ## Key Tools -/
+/-! ### Support-agreement and swap-conjugation lemmas -/
 
 /-- Two permutations that agree on the support of `x` act the same on `x`. -/
 theorem act_eq_of_agree_on_supp {α : Type*} [NomSet α] (π₁ π₂ : FinPerm) (x : α)
@@ -58,8 +58,8 @@ theorem swap_mul_comm (π : FinPerm) (a b : Atom) :
   · by_cases hdb : d = b
     · subst hdb; simp
     · rw [FinPerm.swap_apply_of_ne_of_ne hda hdb]
-      have h1 : π d ≠ π a := fun h => hda (by simp [FinPerm.apply_def] at h; exact h)
-      have h2 : π d ≠ π b := fun h => hdb (by simp [FinPerm.apply_def] at h; exact h)
+      have h1 : π d ≠ π a := fun h => hda (by simpa [FinPerm.apply_def] using h)
+      have h2 : π d ≠ π b := fun h => hdb (by simpa [FinPerm.apply_def] using h)
       rw [FinPerm.swap_apply_of_ne_of_ne h1 h2]
 
 /-- Conjugation of swap through a permutation on NomSet actions:
@@ -93,7 +93,7 @@ theorem fresh_act_of_fresh {α : Type*} [NomSet α] (π : FinPerm) (c : Atom) (x
   obtain ⟨a, ha, hae⟩ := hmem
   exact h (π.val.injective (show π.val a = π.val c from by exact_mod_cast hae) ▸ ha)
 
-/-! ## Section 1: Swap Conjugation -/
+/-! ### Swap conjugation -/
 
 namespace FinPerm
 
@@ -106,7 +106,7 @@ theorem swap_conj (a b c : Atom) (hca : c ≠ a) (hcb : c ≠ b) :
 
 end FinPerm
 
-/-! ## Section 2: Equivalence Relation -/
+/-! ### The abstraction equivalence relation -/
 
 /-- The name abstraction equivalence relation.
     Two pairs `(a, x)` and `(b, y)` are related if for some atom `c` fresh for both,
@@ -204,25 +204,25 @@ theorem trans {p q r : Atom × α} (hpq : AbsRel p q) (hqr : AbsRel q r) : AbsRe
 end AbsRel
 
 /-- The setoid for name abstraction. -/
-def absRel_setoid (α : Type*) [NomSet α] : Setoid (Atom × α) where
+def absRelSetoid (α : Type*) [NomSet α] : Setoid (Atom × α) where
   r := AbsRel
   iseqv := ⟨AbsRel.refl, AbsRel.symm, AbsRel.trans⟩
 
-/-! ## Section 3: NameAbs Quotient Type -/
+/-! ### The quotient type -/
 
 /-- Name abstraction: the quotient of `Atom × α` by the equivalence
     "same up to fresh renaming". This is the nominal analogue of
     alpha-equivalence classes for binders (Pitts, Chapter 4).
     Defined as `abbrev` so instance search can see through it. -/
-abbrev NameAbs (α : Type*) [NomSet α] := Quotient (absRel_setoid α)
+abbrev NameAbs (α : Type*) [NomSet α] := Quotient (absRelSetoid α)
 
 scoped notation "[𝔸]" α => NameAbs α
 
 /-- Construct a name abstraction from an atom and an element. -/
 def abs {α : Type*} [NomSet α] (a : Atom) (x : α) : NameAbs α :=
-  Quotient.mk (absRel_setoid α) (a, x)
+  Quotient.mk (absRelSetoid α) (a, x)
 
-/-! ## Section 4: Key Computation Rule -/
+/-! ### The renaming rule -/
 
 /-- The fundamental computation rule for name abstraction:
     `abs a x = abs b (swap a b • x)` when `b` is fresh for `x`. -/
@@ -257,7 +257,7 @@ theorem abs_rename {α : Type*} [NomSet α] (a : Atom) (x : α) (b : Atom)
         FinPerm.swap_apply_of_ne_of_ne hy_ne_b hy_ne_c,
         FinPerm.swap_apply_of_ne_of_ne hya hy_ne_c]
 
-/-! ## Section 5: Permutation Action -/
+/-! ### The permutation action -/
 
 /-- Permutations preserve the abstraction equivalence relation. -/
 theorem AbsRel_act {α : Type*} [NomSet α] (π : FinPerm) {p q : Atom × α}
@@ -293,7 +293,7 @@ noncomputable instance instMulActionNameAbs {α : Type*} [NomSet α] :
 theorem smul_abs {α : Type*} [NomSet α] (π : FinPerm) (a : Atom) (x : α) :
     π • abs a x = abs (π • a) (π • x) := rfl
 
-/-! ## Section 6: NomSet Instance -/
+/-! ### The nominal-set instance -/
 
 /-- Support of a name abstraction representative: `supp x \ {a}`. -/
 private noncomputable def absSupp {α : Type*} [NomSet α] (p : Atom × α) : Finset Atom :=
@@ -401,7 +401,7 @@ noncomputable instance instNomSetNameAbs {α : Type*} [NomSet α] :
       have : π b = π p.1 := by exact_mod_cast (hba ▸ h)
       exact π.val.injective this
 
-/-! ## Section 7: Some-Any Property & Concretion -/
+/-! ### The some-any property and concretion -/
 
 /-- The "some-any" property: if AbsRel holds with one fresh witness,
     it holds with any fresh witness. -/
@@ -480,7 +480,7 @@ theorem concretize_abs {α : Type*} [NomSet α] (a b : Atom) (x : α)
     (ha : Fresh a (abs b x)) : concretize a (abs b x) = FinPerm.swap a b • x := by
   unfold concretize
   have hrel : AbsRel (abs b x).out (b, x) :=
-    Quotient.mk_out (s := absRel_setoid α) (b, x)
+    Quotient.mk_out (s := absRelSetoid α) (b, x)
   exact concretize_wd a hrel (by rw [absSupp_eq_of_absRel hrel]; exact ha)
 
 /-- Concretize applied to an abstraction where `a` matches. -/
@@ -488,7 +488,7 @@ theorem concretize_abs_self {α : Type*} [NomSet α] (a : Atom) (x : α)
     (ha : Fresh a (abs a x)) : concretize a (abs a x) = x := by
   rw [concretize_abs a a x ha, FinPerm.swap_self, one_smul]
 
-/-! ## Section 8: Equivariance & Functorial Map -/
+/-! ### Equivariance and the functorial map -/
 
 /-- An equivariant function preserves the permutation action. -/
 def Equivariant {α β : Type*} [MulAction FinPerm α] [MulAction FinPerm β] (f : α → β) : Prop :=
@@ -533,7 +533,7 @@ theorem NameAbs.map_abs {α β : Type*} [NomSet α] [NomSet β]
     NameAbs.map f hf (abs a x) = abs a (f x) := by
   simp [NameAbs.map, abs, Quotient.map_mk]
 
-/-! ## Section 9: Elimination Principle (Nominal Recursion)
+/-! ### The elimination principle (nominal recursion)
 
 Pitts, *Nominal Sets*, Chapter 8: to define a function *out of* `[𝔸]α` one
 needs a derived eliminator. `NameAbs.lift` is the underlying `Quotient.lift`:
