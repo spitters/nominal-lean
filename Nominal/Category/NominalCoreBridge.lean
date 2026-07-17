@@ -216,13 +216,13 @@ action, transported from the `FinPerm` action via finite support. -/
 noncomputable def coreToGSet (α : Type) [NomSet α] : GSet where
   V := α
   ρ :=
-    { toFun := fun π x => fullSmul (fromPermℕ π) x
+    { toFun := fun π => TypeCat.ofHom (fun x => fullSmul (fromPermℕ π) x)
       map_one' := by
-        funext x
+        apply ConcreteCategory.hom_ext; intro x
         show fullSmul (fromPermℕ 1) x = x
         rw [fromPermℕ_one, fullSmul_one]
       map_mul' := fun a b => by
-        funext x
+        apply ConcreteCategory.hom_ext; intro x
         show fullSmul (fromPermℕ (a * b)) x = fullSmul (fromPermℕ a) (fullSmul (fromPermℕ b) x)
         rw [fromPermℕ_mul, fullSmul_mul] }
 

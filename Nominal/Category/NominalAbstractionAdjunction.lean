@@ -77,21 +77,21 @@ lemma absPt_inj_body {a : Atom} {y y' : X.V} (h : absPt X a y = absPt X a y') : 
   have hrel : AbsRel X (a, y) (a, y') := Quotient.exact h
   obtain ⟨s, hs⟩ := hrel
   obtain ⟨c, hc⟩ := Infinite.exists_notMem_finset s
-  have e : X.ρ (Equiv.swap a c) y = X.ρ (Equiv.swap a c) y' := hs c hc
-  have e2 : X.ρ (Equiv.swap a c) (X.ρ (Equiv.swap a c) y)
-      = X.ρ (Equiv.swap a c) (X.ρ (Equiv.swap a c) y') := by rw [e]
+  have e : X.act (Equiv.swap a c) y = X.act (Equiv.swap a c) y' := hs c hc
+  have e2 : X.act (Equiv.swap a c) (X.act (Equiv.swap a c) y)
+      = X.act (Equiv.swap a c) (X.act (Equiv.swap a c) y') := by rw [e]
   rwa [← GSet.act_mul, ← GSet.act_mul, Equiv.swap_mul_self, GSet.act_one, GSet.act_one] at e2
 
 /-- One inclusion of least-support equivariance. -/
 lemma supp_smul_subset {A : GSet} (hA : IsNominal A) (π : PermAtom) (x : A.V) :
-    supp hA (A.ρ π x) ⊆ (supp hA x).image π :=
+    supp hA (A.act π x) ⊆ (supp hA x).image π :=
   supp_le hA ((supp_supports hA x).smul π)
 
 /-- **Equivariance of the least support**: `supp (π • x) = π • (supp x)`. -/
 lemma supp_smul {A : GSet} (hA : IsNominal A) (π : PermAtom) (x : A.V) :
-    supp hA (A.ρ π x) = (supp hA x).image π := by
+    supp hA (A.act π x) = (supp hA x).image π := by
   apply Finset.Subset.antisymm (supp_smul_subset hA π x)
-  have h1 := supp_smul_subset hA π⁻¹ (A.ρ π x)
+  have h1 := supp_smul_subset hA π⁻¹ (A.act π x)
   rw [← GSet.act_mul, inv_mul_cancel, GSet.act_one] at h1
   intro y hy
   rw [Finset.mem_image] at hy
@@ -103,12 +103,12 @@ lemma supp_smul {A : GSet} (hA : IsNominal A) (π : PermAtom) (x : A.V) :
   rw [this]; exact hw
 
 /-- Computation of the atom-object action. -/
-@[simp] lemma atomGSet_ρ_apply (π : PermAtom) (a : Atom) : atomGSet.ρ π a = π a := rfl
+@[simp] lemma atomGSet_ρ_apply (π : PermAtom) (a : Atom) : atomGSet.act π a = π a := rfl
 
 /-- Computation of the separated-product action on an explicit pair. -/
 @[simp] lemma sepGSet_ρ_mk {A B : GSet} (π : PermAtom) (a : A.V) (b : B.V)
     (h : Separated A B a b) :
-    (sepGSet A B).ρ π ⟨(a, b), h⟩ = ⟨(A.ρ π a, B.ρ π b), h.smul π⟩ := rfl
+    (sepGSet A B).act π ⟨(a, b), h⟩ = ⟨(A.act π a, B.act π b), h.smul π⟩ := rfl
 
 /-- An atom in the support of an atom-object element belongs to any of its finite supports. -/
 lemma atom_mem_of_supports {s : Finset Atom} {a : Atom}
@@ -117,10 +117,10 @@ lemma atom_mem_of_supports {s : Finset Atom} {a : Atom}
   obtain ⟨e, he⟩ := Infinite.exists_notMem_finset (insert a s)
   simp only [Finset.mem_insert, not_or] at he
   obtain ⟨hea, hes⟩ := he
-  have hfix : atomGSet.ρ (Equiv.swap a e) a = a :=
+  have hfix : atomGSet.act (Equiv.swap a e) a = a :=
     h _ (fun d hd => Equiv.swap_apply_of_ne_of_ne
       (fun h' => ha (h' ▸ hd)) (fun h' => hes (h' ▸ hd)))
-  rw [show atomGSet.ρ (Equiv.swap a e) a = Equiv.swap a e a from rfl, Equiv.swap_apply_left] at hfix
+  rw [show atomGSet.act (Equiv.swap a e) a = Equiv.swap a e a from rfl, Equiv.swap_apply_left] at hfix
   exact hea hfix
 
 /-- Freshness of the head atom for a separated pair `(a, y)` in `𝔸 ⊗ₙ Y`: `a` is fresh for `y`. -/
@@ -148,12 +148,12 @@ lemma fresh_abs {hX : IsNominal X} {a b : Atom} {x : X.V}
     (supp (absGSet_isNominal hX) (absPt X b x) ∪ supp hX x ∪ {a, b})
   simp only [Finset.mem_union, Finset.mem_insert, Finset.mem_singleton, not_or] at he
   obtain ⟨⟨heScls, hesupp⟩, hea, heb⟩ := he
-  have hswap_fix : (absGSet X).ρ (Equiv.swap a e) (absPt X b x) = absPt X b x := by
+  have hswap_fix : (absGSet X).act (Equiv.swap a e) (absPt X b x) = absPt X b x := by
     apply hcls
     intro d hd
     exact Equiv.swap_apply_of_ne_of_ne (fun h' => hfresh (h' ▸ hd)) (fun h' => heScls (h' ▸ hd))
   rw [absGSet_ρ_mk, Equiv.swap_apply_of_ne_of_ne (Ne.symm hab) (Ne.symm heb)] at hswap_fix
-  have hxx : X.ρ (Equiv.swap a e) x = x := absPt_inj_body hswap_fix
+  have hxx : X.act (Equiv.swap a e) x = x := absPt_inj_body hswap_fix
   have hsupp_eq : supp hX x = (supp hX x).image (Equiv.swap a e) := by
     conv_lhs => rw [← hxx]
     rw [supp_smul hX (Equiv.swap a e) x]
@@ -165,7 +165,7 @@ lemma fresh_abs {hX : IsNominal X} {a b : Atom} {x : X.V}
 /-- Concretion witness law: for fresh `a`, abstracting `swap a b • x` at `a` recovers `⟦(b, x)⟧`. -/
 lemma absPt_swap_eq {hX : IsNominal X} {a b : Atom} {x : X.V}
     (hfresh : a ∉ supp (absGSet_isNominal hX) (absPt X b x)) :
-    absPt X a (X.ρ (Equiv.swap a b) x) = absPt X b x := by
+    absPt X a (X.act (Equiv.swap a b) x) = absPt X b x := by
   by_cases hab : a = b
   · subst hab
     rw [show (Equiv.swap a a : PermAtom) = 1 from Equiv.swap_self a, GSet.act_one]
@@ -184,7 +184,7 @@ noncomputable def concValue (a : Atom) (q : (absGSet X).V) : X.V :=
 /-- **Computation rule** for concretion: for fresh `a`, `concValue a ⟦(b, x)⟧ = swap a b • x`. -/
 lemma concValue_absPt {hX : IsNominal X} {a b : Atom} {x : X.V}
     (hfresh : a ∉ supp (absGSet_isNominal hX) (absPt X b x)) :
-    concValue a (absPt X b x) = X.ρ (Equiv.swap a b) x := by
+    concValue a (absPt X b x) = X.act (Equiv.swap a b) x := by
   have hex : ∃ y : X.V, absPt X a y = absPt X b x := ⟨_, absPt_swap_eq (hX := hX) hfresh⟩
   rw [concValue, dif_pos hex]
   exact absPt_inj_body (hex.choose_spec.trans (absPt_swap_eq (hX := hX) hfresh).symm)
@@ -192,16 +192,16 @@ lemma concValue_absPt {hX : IsNominal X} {a b : Atom} {x : X.V}
 /-- **Equivariance of concretion** on fresh pairs. -/
 lemma concValue_equivariant {hX : IsNominal X} (π : PermAtom) {a : Atom} {q : (absGSet X).V}
     (hfresh : a ∉ supp (absGSet_isNominal hX) q) :
-    concValue (π a) ((absGSet X).ρ π q) = X.ρ π (concValue a q) := by
+    concValue (π a) ((absGSet X).act π q) = X.act π (concValue a q) := by
   induction q using Quotient.inductionOn with
   | _ p =>
     obtain ⟨b, x⟩ := p
-    have hfresh' : (π a) ∉ supp (absGSet_isNominal hX) ((absGSet X).ρ π (absPt X b x)) := by
+    have hfresh' : (π a) ∉ supp (absGSet_isNominal hX) ((absGSet X).act π (absPt X b x)) := by
       rw [supp_smul (absGSet_isNominal hX) π (absPt X b x), Finset.mem_image]
       rintro ⟨c, hc, hceq⟩
       exact hfresh (π.injective hceq ▸ hc)
-    show concValue (π a) ((absGSet X).ρ π (absPt X b x))
-      = X.ρ π (concValue a (absPt X b x))
+    show concValue (π a) ((absGSet X).act π (absPt X b x))
+      = X.act π (concValue a (absPt X b x))
     rw [absGSet_ρ_mk, concValue_absPt (hX := hX) hfresh', concValue_absPt (hX := hX) hfresh,
       ← GSet.act_mul, ← GSet.act_mul, swap_mul_perm]
 
@@ -219,11 +219,11 @@ lemma absPt_concValue {hX : IsNominal X} {a : Atom} {q : (absGSet X).V}
 /-- The underlying `GSet` morphism of concretion. -/
 noncomputable def concretizeHom (X : Nom) :
     sepGSet atomGSet (absGSet X.obj) ⟶ X.obj where
-  hom := fun p => concValue p.1.1 p.1.2
+  hom := TypeCat.ofHom (fun p => concValue p.1.1 p.1.2)
   comm := by
     intro π
-    funext p
-    show concValue (π p.1.1) ((absGSet X.obj).ρ π p.1.2) = X.obj.ρ π (concValue p.1.1 p.1.2)
+    apply ConcreteCategory.hom_ext; intro p
+    show concValue (π p.1.1) ((absGSet X.obj).act π p.1.2) = X.obj.act π (concValue p.1.1 p.1.2)
     exact concValue_equivariant (hX := X.property) π
       (fresh_of_sep (absGSet_isNominal X.property) p.2)
 
@@ -269,10 +269,10 @@ lemma unitPt_indep {A : Nom} {a a' : Atom} {x : A.obj.V}
     have hrn := absPt_rename (X := sepGSet atomGSet A.obj) (s := {a} ∪ supp A.property x)
       (a := a) (b := a') (x := ⟨(a, x), sep_atom_of_fresh h⟩) hp ha'ns (fun he => haa he.symm)
     rw [hrn]
-    have hpair : (sepGSet atomGSet A.obj).ρ (Equiv.swap a a') ⟨(a, x), sep_atom_of_fresh h⟩
+    have hpair : (sepGSet atomGSet A.obj).act (Equiv.swap a a') ⟨(a, x), sep_atom_of_fresh h⟩
         = (⟨(a', x), sep_atom_of_fresh h'⟩ : sepCarrier atomGSet A.obj) := by
       apply Subtype.ext
-      show (Equiv.swap a a' a, A.obj.ρ (Equiv.swap a a') x) = (a', x)
+      show (Equiv.swap a a' a, A.obj.act (Equiv.swap a a') x) = (a', x)
       rw [Equiv.swap_apply_left, swap_apply_eq_self (supp_supports A.property x) h h']
     rw [hpair]
 
@@ -283,26 +283,26 @@ lemma unitVal_eq {A : Nom} {a : Atom} {x : A.obj.V} (h : a ∉ supp A.property x
 
 /-- **Equivariance of the unit.** -/
 lemma unitVal_equivariant {A : Nom} (π : PermAtom) (x : A.obj.V) :
-    (absGSet (sepGSet atomGSet A.obj)).ρ π (unitVal A x) = unitVal A (A.obj.ρ π x) := by
+    (absGSet (sepGSet atomGSet A.obj)).act π (unitVal A x) = unitVal A (A.obj.act π x) := by
   have hfx := freshFor_spec A x
   rw [unitVal_eq hfx, absGSet_ρ_mk]
-  have hπfresh : (π (freshFor A x)) ∉ supp A.property (A.obj.ρ π x) := by
+  have hπfresh : (π (freshFor A x)) ∉ supp A.property (A.obj.act π x) := by
     rw [supp_smul A.property π x, Finset.mem_image]
     rintro ⟨c, hc, hceq⟩
     exact hfx (π.injective hceq ▸ hc)
   rw [unitVal_eq hπfresh]
-  have hpair : (sepGSet atomGSet A.obj).ρ π ⟨(freshFor A x, x), sep_atom_of_fresh hfx⟩
-      = (⟨(π (freshFor A x), A.obj.ρ π x), sep_atom_of_fresh hπfresh⟩ : sepCarrier atomGSet A.obj) := by
+  have hpair : (sepGSet atomGSet A.obj).act π ⟨(freshFor A x, x), sep_atom_of_fresh hfx⟩
+      = (⟨(π (freshFor A x), A.obj.act π x), sep_atom_of_fresh hπfresh⟩ : sepCarrier atomGSet A.obj) := by
     apply Subtype.ext; rfl
   rw [hpair]
 
 /-- The underlying `GSet` morphism of the unit. -/
 noncomputable def unitHom (A : Nom) : A.obj ⟶ absGSet (sepGSet atomGSet A.obj) where
-  hom := unitVal A
+  hom := TypeCat.ofHom (unitVal A)
   comm := by
     intro π
-    funext x
-    show unitVal A (A.obj.ρ π x) = (absGSet (sepGSet atomGSet A.obj)).ρ π (unitVal A x)
+    apply ConcreteCategory.hom_ext; intro x
+    show unitVal A (A.obj.act π x) = (absGSet (sepGSet atomGSet A.obj)).act π (unitVal A x)
     exact (unitVal_equivariant π x).symm
 
 /-- **The unit** `η A : A ⟶ [𝔸](𝔸 ⊗ₙ A)` of the binding adjunction. -/
@@ -338,7 +338,7 @@ lemma homEquiv_right_inv (A B : Nom) (g : A ⟶ absF.obj B) :
     homEquivToFun A B (homEquivInvFun A B g) = g := by
   apply ObjectProperty.hom_ext
   apply Action.Hom.ext
-  funext x
+  apply ConcreteCategory.hom_ext; intro x
   rw [homEquivToFun_apply, homEquivInvFun_apply]
   exact absPt_concValue (hX := B.property)
     (fresh_map A.property (absGSet_isNominal B.property) g.hom (freshFor_spec A x))
@@ -365,20 +365,21 @@ lemma homEquiv_left_inv_apply (A B : Nom) (f : (atomObj ⊗ₙ A) ⟶ B)
     · exact hmem2.2 h1
     · exact hax h2
   rw [concValue_absPt (hX := B.property) hfresh_a]
-  have hcomm : f.hom.hom ((sepGSet atomGSet A.obj).ρ (Equiv.swap a (freshFor A x))
+  have hcomm : f.hom.hom ((sepGSet atomGSet A.obj).act (Equiv.swap a (freshFor A x))
         ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩)
-      = B.obj.ρ (Equiv.swap a (freshFor A x))
-        (f.hom.hom ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩) :=
-    congrFun (f.hom.comm (Equiv.swap a (freshFor A x)))
-      ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩
+      = B.obj.act (Equiv.swap a (freshFor A x))
+        (f.hom.hom ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩) := by
+    simpa only [ConcreteCategory.comp_apply] using
+      ConcreteCategory.congr_hom (f.hom.comm (Equiv.swap a (freshFor A x)))
+        ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩
   rw [← hcomm]
-  have hwpair : (sepGSet atomGSet A.obj).ρ (Equiv.swap a (freshFor A x))
+  have hwpair : (sepGSet atomGSet A.obj).act (Equiv.swap a (freshFor A x))
         ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩
       = (⟨(a, x), hsep⟩ : sepCarrier atomGSet A.obj) := by
     rw [sepGSet_ρ_mk]
     apply Subtype.ext
-    show (atomGSet.ρ (Equiv.swap a (freshFor A x)) (freshFor A x),
-      A.obj.ρ (Equiv.swap a (freshFor A x)) x) = (a, x)
+    show (atomGSet.act (Equiv.swap a (freshFor A x)) (freshFor A x),
+      A.obj.act (Equiv.swap a (freshFor A x)) x) = (a, x)
     rw [atomGSet_ρ_apply, Equiv.swap_apply_right,
       swap_apply_eq_self (supp_supports A.property x) hax ha0x]
   rw [hwpair]
@@ -388,7 +389,7 @@ lemma homEquiv_left_inv (A B : Nom) (f : (atomObj ⊗ₙ A) ⟶ B) :
     homEquivInvFun A B (homEquivToFun A B f) = f := by
   apply ObjectProperty.hom_ext
   apply Action.Hom.ext
-  funext p
+  apply ConcreteCategory.hom_ext; intro p
   exact homEquiv_left_inv_apply A B f p
 
 /-- **The binding hom-set bijection** `(𝔸 ⊗ₙ A ⟶ B) ≃ (A ⟶ [𝔸]B)`. -/
@@ -407,13 +408,13 @@ noncomputable def bindingAdjunction : MonoidalCategory.tensorLeft atomObj ⊣ ab
         intro A' A B f g
         apply ObjectProperty.hom_ext
         apply Action.Hom.ext
-        funext p
+        apply ConcreteCategory.hom_ext; intro p
         rfl
       homEquiv_naturality_right := by
         intro A B B' f g
         apply ObjectProperty.hom_ext
         apply Action.Hom.ext
-        funext x
+        apply ConcreteCategory.hom_ext; intro x
         rfl }
 
 end Nominal

@@ -19,13 +19,13 @@ sub-object of the separated internal hom `𝔸 ⊸ₛ X` (`CatCrypt.Category.Nom
 
 The nominal-sets fact (Pitts, *Nominal Sets*) is that an abstraction `[a]x` **is** the partial
 function `b ↦ (a b)·x`, defined off the support of `x`.  Concretely, `[a]x` maps to the
-fresh-agreement class of the total finitely-supported function `b ↦ X.ρ (swap a b) x`.  Two
+fresh-agreement class of the total finitely-supported function `b ↦ X.act (swap a b) x`.  Two
 representatives `(a, x)`, `(a', x')` are α-equivalent exactly when these functions agree on all
 fresh arguments, which is exactly fresh agreement — so the map is injective, i.e. a monomorphism.
 
 ## Main definitions
 
-* `absToExpFun`, `absToExpCarrier` — the underlying total function `b ↦ X.ρ (swap a b) x` and its
+* `absToExpFun`, `absToExpCarrier` — the underlying total function `b ↦ X.act (swap a b) x` and its
   packaging as a finitely-supported function `funCarrier 𝔸 X` (supported by `insert a (supp x)`).
 * `absToExpFn` — the map on quotients `[𝔸]X → (𝔸 ⊸ₛ X)`, sending `⟦(a, x)⟧` to the fresh-agreement
   class of `absToExpCarrier a x`; well defined by `absToExp_freshAgree`.
@@ -63,10 +63,10 @@ lemma atomGSet_supports_mem {s : Finset Atom} {a : Atom} (hsupp : Supports atomG
   obtain ⟨c, hc⟩ := Infinite.exists_notMem_finset (insert a s)
   rw [Finset.mem_insert, not_or] at hc
   obtain ⟨hca, hcs⟩ := hc
-  have hfix : atomGSet.ρ (Equiv.swap a c) a = a :=
+  have hfix : atomGSet.act (Equiv.swap a c) a = a :=
     hsupp (Equiv.swap a c) (fun e he =>
       Equiv.swap_apply_of_ne_of_ne (fun hh => ha (hh ▸ he)) (fun hh => hcs (hh ▸ he)))
-  rw [show atomGSet.ρ (Equiv.swap a c) a = Equiv.swap a c a from rfl, Equiv.swap_apply_left] at hfix
+  rw [show atomGSet.act (Equiv.swap a c) a = Equiv.swap a c a from rfl, Equiv.swap_apply_left] at hfix
   exact hca hfix
 
 /-- Every atom lies in its own least support. -/
@@ -75,9 +75,9 @@ lemma atom_mem_supp (b : Atom) : b ∈ supp atomObj.property b :=
 
 /-! ## The underlying partial function `b ↦ swap a b · x` -/
 
-/-- The total function underlying the abstraction `[a]x`: `b ↦ X.ρ (swap a b) x`. -/
+/-- The total function underlying the abstraction `[a]x`: `b ↦ X.act (swap a b) x`. -/
 def absToExpFun (X : Nom) (a : Atom) (x : X.obj.V) : atomObj.obj.V → X.obj.V :=
-  fun b => X.obj.ρ (Equiv.swap a b) x
+  fun b => X.obj.act (Equiv.swap a b) x
 
 /-- The function `b ↦ swap a b · x` is finitely supported (for the conjugation action):
 if `s` supports `x` then `insert a s` supports it. -/
@@ -87,8 +87,8 @@ lemma absToExpFun_supported (X : Nom) {s : Finset Atom} {a : Atom} {x : X.obj.V}
   intro π hπ
   funext b
   have hπa : π a = a := hπ a (Finset.mem_insert_self a s)
-  have hx : X.obj.ρ π x = x := hs π (fun c hc => hπ c (Finset.mem_insert_of_mem hc))
-  show X.obj.ρ π (X.obj.ρ (Equiv.swap a (π⁻¹ b)) x) = X.obj.ρ (Equiv.swap a b) x
+  have hx : X.obj.act π x = x := hs π (fun c hc => hπ c (Finset.mem_insert_of_mem hc))
+  show X.obj.act π (X.obj.act (Equiv.swap a (π⁻¹ b)) x) = X.obj.act (Equiv.swap a b) x
   have hpi : π (π⁻¹ b) = b := by
     rw [← Equiv.Perm.mul_apply, mul_inv_cancel, Equiv.Perm.one_apply]
   have hperm : π * Equiv.swap a (π⁻¹ b) = Equiv.swap a b * π := by
@@ -142,11 +142,11 @@ lemma absToExp_freshAgree (X : Nom) {p q : Atom × X.obj.V} (h : AbsRel X.obj p 
     Equiv.swap_apply_of_ne_of_ne (fun hh => hbf (hh ▸ he)) (fun hh => hcf (hh ▸ he))
   have hπg : ∀ e ∈ fsupp atomObj X g, (Equiv.swap b c) e = e := fun e he =>
     Equiv.swap_apply_of_ne_of_ne (fun hh => hbg (hh ▸ he)) (fun hh => hcg (hh ▸ he))
-  have hbc : atomObj.obj.ρ (Equiv.swap b c) b = c := Equiv.swap_apply_left b c
-  have ef : f.1 b = X.obj.ρ (Equiv.swap b c)⁻¹ (f.1 c) := by
+  have hbc : atomObj.obj.act (Equiv.swap b c) b = c := Equiv.swap_apply_left b c
+  have ef : f.1 b = X.obj.act (Equiv.swap b c)⁻¹ (f.1 c) := by
     have hr := funGSetFull_recover hSf hπf b
     rwa [hbc] at hr
-  have eg : g.1 b = X.obj.ρ (Equiv.swap b c)⁻¹ (g.1 c) := by
+  have eg : g.1 b = X.obj.act (Equiv.swap b c)⁻¹ (g.1 c) := by
     have hr := funGSetFull_recover hSg hπg b
     rwa [hbc] at hr
   have hcval : f.1 c = g.1 c := hs c hcs
@@ -162,15 +162,15 @@ noncomputable def absToExpFn (X : Nom) : (absGSet X.obj).V → (sepExpGSet atomO
 /-- Equivariance of the building block: `π • (b ↦ swap a b · x) = (b ↦ swap (π a) b · (π · x))`
 as elements of the internal hom.  This is an *equality* (not just fresh agreement). -/
 lemma absToExpCarrier_smul (X : Nom) (π : PermAtom) (a : Atom) (x : X.obj.V) :
-    (funGSet atomObj.obj X.obj).ρ π (absToExpCarrier X a x)
-      = absToExpCarrier X (π a) (X.obj.ρ π x) := by
+    (funGSet atomObj.obj X.obj).act π (absToExpCarrier X a x)
+      = absToExpCarrier X (π a) (X.obj.act π x) := by
   apply Subtype.ext
   funext b
-  show (funGSetFull atomObj.obj X.obj).ρ π (absToExpFun X a x) b
-      = X.obj.ρ (Equiv.swap (π a) b) (X.obj.ρ π x)
+  show (funGSetFull atomObj.obj X.obj).act π (absToExpFun X a x) b
+      = X.obj.act (Equiv.swap (π a) b) (X.obj.act π x)
   rw [funGSetFull_ρ]
-  show X.obj.ρ π (X.obj.ρ (Equiv.swap a (π⁻¹ b)) x)
-      = X.obj.ρ (Equiv.swap (π a) b) (X.obj.ρ π x)
+  show X.obj.act π (X.obj.act (Equiv.swap a (π⁻¹ b)) x)
+      = X.obj.act (Equiv.swap (π a) b) (X.obj.act π x)
   have hpi : π (π⁻¹ b) = b := by
     rw [← Equiv.Perm.mul_apply, mul_inv_cancel, Equiv.Perm.one_apply]
   have hperm : π * Equiv.swap a (π⁻¹ b) = Equiv.swap (π a) b * π := by
@@ -179,18 +179,18 @@ lemma absToExpCarrier_smul (X : Nom) (π : PermAtom) (a : Atom) (x : X.obj.V) :
 
 /-- Underlying `Action.Hom` of the abstraction monomorphism. -/
 noncomputable def absToExpActionHom (X : Nom) : absGSet X.obj ⟶ sepExpGSet atomObj X where
-  hom := absToExpFn X
+  hom := TypeCat.ofHom (absToExpFn X)
   comm := by
     intro π
-    funext qq
+    apply ConcreteCategory.hom_ext; intro qq
     induction qq using Quotient.inductionOn with
     | _ pr =>
       obtain ⟨a, x⟩ := pr
-      show absToExpFn X ((absGSet X.obj).ρ π (absPt X.obj a x))
-          = (sepExpGSet atomObj X).ρ π (absToExpFn X (absPt X.obj a x))
+      show absToExpFn X ((absGSet X.obj).act π (absPt X.obj a x))
+          = (sepExpGSet atomObj X).act π (absToExpFn X (absPt X.obj a x))
       rw [absGSet_ρ_mk]
-      show Quotient.mk (freshAgreeSetoid atomObj X) (absToExpCarrier X (π a) (X.obj.ρ π x))
-          = (sepExpGSet atomObj X).ρ π
+      show Quotient.mk (freshAgreeSetoid atomObj X) (absToExpCarrier X (π a) (X.obj.act π x))
+          = (sepExpGSet atomObj X).act π
               (Quotient.mk (freshAgreeSetoid atomObj X) (absToExpCarrier X a x))
       rw [sepExpGSet_ρ_mk, absToExpCarrier_smul]
 
@@ -232,8 +232,9 @@ theorem absToExp_mono (X : Nom) : Mono (absToExp X) := by
   intro Z g h hgh
   apply ObjectProperty.hom_ext
   apply Action.Hom.ext
-  funext z
+  apply ConcreteCategory.hom_ext; intro z
   apply absToExpFn_injective X
-  exact congrArg (fun m : Z ⟶ atomObj ⊸ₛ X => m.hom.hom z) hgh
+  simpa only [ConcreteCategory.comp_apply] using
+    congrArg (fun m : Z ⟶ atomObj ⊸ₛ X => ConcreteCategory.hom m.hom.hom z) hgh
 
 end Nominal

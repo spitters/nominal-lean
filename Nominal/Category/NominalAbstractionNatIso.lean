@@ -81,7 +81,7 @@ lemma swapFin_mul_perm (π : FinPerm) (a b : CatCrypt.Nominal.Atom) :
 representatives agree at every atom outside some finite set. The `FinPerm` mirror of `AbsRel`. -/
 def AbsRelFin (X : GSetFin) (p q : CatCrypt.Nominal.Atom × X.V) : Prop :=
   ∃ s : Finset CatCrypt.Nominal.Atom,
-    ∀ c ∉ s, X.ρ (FinPerm.swap p.1 c) p.2 = X.ρ (FinPerm.swap q.1 c) q.2
+    ∀ c ∉ s, X.act (FinPerm.swap p.1 c) p.2 = X.act (FinPerm.swap q.1 c) q.2
 
 namespace AbsRelFin
 
@@ -114,7 +114,7 @@ def absSetoidFin (X : GSetFin) : Setoid (CatCrypt.Nominal.Atom × X.V) where
 /-- α-equivalence is preserved by the diagonal `FinPerm`-action. -/
 theorem AbsRelFin_smul {X : GSetFin} (π : FinPerm) {p q : CatCrypt.Nominal.Atom × X.V}
     (h : AbsRelFin X p q) :
-    AbsRelFin X (π p.1, X.ρ π p.2) (π q.1, X.ρ π q.2) := by
+    AbsRelFin X (π p.1, X.act π p.2) (π q.1, X.act π q.2) := by
   obtain ⟨s, hs⟩ := h
   refine ⟨s.image (π ·), fun d hd => ?_⟩
   have hdc : π (π⁻¹ d) = d := by
@@ -123,36 +123,36 @@ theorem AbsRelFin_smul {X : GSetFin} (π : FinPerm) {p q : CatCrypt.Nominal.Atom
     intro hmem
     exact hd (by simpa [hdc] using Finset.mem_image_of_mem (π ·) hmem)
   have hkey := hs (π⁻¹ d) hc
-  calc X.ρ (FinPerm.swap (π p.1) d) (X.ρ π p.2)
-      = X.ρ (FinPerm.swap (π p.1) (π (π⁻¹ d)) * π) p.2 := by
+  calc X.act (FinPerm.swap (π p.1) d) (X.act π p.2)
+      = X.act (FinPerm.swap (π p.1) (π (π⁻¹ d)) * π) p.2 := by
         rw [hdc, ← GSetFin.act_mul]
-    _ = X.ρ (π * FinPerm.swap p.1 (π⁻¹ d)) p.2 := by rw [swapFin_mul_perm]
-    _ = X.ρ π (X.ρ (FinPerm.swap p.1 (π⁻¹ d)) p.2) := GSetFin.act_mul X _ _ _
-    _ = X.ρ π (X.ρ (FinPerm.swap q.1 (π⁻¹ d)) q.2) := by rw [hkey]
-    _ = X.ρ (π * FinPerm.swap q.1 (π⁻¹ d)) q.2 := (GSetFin.act_mul X _ _ _).symm
-    _ = X.ρ (FinPerm.swap (π q.1) (π (π⁻¹ d)) * π) q.2 := by rw [swapFin_mul_perm]
-    _ = X.ρ (FinPerm.swap (π q.1) d) (X.ρ π q.2) := by rw [hdc, ← GSetFin.act_mul]
+    _ = X.act (π * FinPerm.swap p.1 (π⁻¹ d)) p.2 := by rw [swapFin_mul_perm]
+    _ = X.act π (X.act (FinPerm.swap p.1 (π⁻¹ d)) p.2) := GSetFin.act_mul X _ _ _
+    _ = X.act π (X.act (FinPerm.swap q.1 (π⁻¹ d)) q.2) := by rw [hkey]
+    _ = X.act (π * FinPerm.swap q.1 (π⁻¹ d)) q.2 := (GSetFin.act_mul X _ _ _).symm
+    _ = X.act (FinPerm.swap (π q.1) (π (π⁻¹ d)) * π) q.2 := by rw [swapFin_mul_perm]
+    _ = X.act (FinPerm.swap (π q.1) d) (X.act π q.2) := by rw [hdc, ← GSetFin.act_mul]
 
 /-- The underlying `GSetFin` of `[𝔸]X` on the `FinPerm` side: the quotient of `Atom × X.V` by
-α-equivalence, with the diagonal action `π • ⟦(a, x)⟧ = ⟦(π a, X.ρ π x)⟧`. -/
+α-equivalence, with the diagonal action `π • ⟦(a, x)⟧ = ⟦(π a, X.act π x)⟧`. -/
 def absGSetFin (X : GSetFin) : GSetFin where
   V := Quotient (absSetoidFin X)
   ρ :=
-    { toFun := fun π =>
-        Quotient.map (fun p => (π p.1, X.ρ π p.2)) (fun _ _ h => AbsRelFin_smul π h)
+    { toFun := fun π => TypeCat.ofHom
+        (Quotient.map (fun p => (π p.1, X.act π p.2)) (fun _ _ h => AbsRelFin_smul π h))
       map_one' := by
-        funext q
+        apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
-          show Quotient.mk (absSetoidFin X) ((1 : FinPerm) p.1, X.ρ (1 : FinPerm) p.2)
+          show Quotient.mk (absSetoidFin X) ((1 : FinPerm) p.1, X.act (1 : FinPerm) p.2)
             = Quotient.mk (absSetoidFin X) p
           rw [FinPerm.one_apply, GSetFin.act_one]
       map_mul' := fun a b => by
-        funext q
+        apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
-          show Quotient.mk (absSetoidFin X) ((a * b) p.1, X.ρ (a * b) p.2)
-            = Quotient.mk (absSetoidFin X) (a (b p.1), X.ρ a (X.ρ b p.2))
+          show Quotient.mk (absSetoidFin X) ((a * b) p.1, X.act (a * b) p.2)
+            = Quotient.mk (absSetoidFin X) (a (b p.1), X.act a (X.act b p.2))
           rw [GSetFin.act_mul]; rfl }
 
 /-- Abstraction point on the `FinPerm` side: the class of `(a, x)` in `[𝔸]X`. -/
@@ -165,12 +165,12 @@ theorem absGSetFin_supports {X : GSetFin} {s : Finset CatCrypt.Nominal.Atom}
     {a : CatCrypt.Nominal.Atom} {x : X.V} (hs : SupportsFin X s x) :
     SupportsFin (absGSetFin X) (s \ {a}) (absPtFin X a x) := by
   intro π hπ
-  show Quotient.mk (absSetoidFin X) (π a, X.ρ π x) = Quotient.mk (absSetoidFin X) (a, x)
+  show Quotient.mk (absSetoidFin X) (π a, X.act π x) = Quotient.mk (absSetoidFin X) (a, x)
   apply Quotient.sound
   refine ⟨insert a (insert (π a) s), fun c hc => ?_⟩
   simp only [Finset.mem_insert, not_or] at hc
   obtain ⟨hca, hcπa, hcs⟩ := hc
-  show X.ρ (FinPerm.swap (π a) c) (X.ρ π x) = X.ρ (FinPerm.swap a c) x
+  show X.act (FinPerm.swap (π a) c) (X.act π x) = X.act (FinPerm.swap a c) x
   rw [← GSetFin.act_mul]
   apply actFin_eq_of_agree hs
   intro d hd
@@ -204,23 +204,26 @@ theorem AbsRelFin_map {X Y : GSetFin} (f : X ⟶ Y) {p q : CatCrypt.Nominal.Atom
   obtain ⟨s, hs⟩ := h
   refine ⟨s, fun c hc => ?_⟩
   have e := hs c hc
-  have fp : f.hom (X.ρ (FinPerm.swap p.1 c) p.2) = Y.ρ (FinPerm.swap p.1 c) (f.hom p.2) :=
-    congrFun (f.comm (FinPerm.swap p.1 c)) p.2
-  have fq : f.hom (X.ρ (FinPerm.swap q.1 c) q.2) = Y.ρ (FinPerm.swap q.1 c) (f.hom q.2) :=
-    congrFun (f.comm (FinPerm.swap q.1 c)) q.2
+  have fp : f.hom (X.act (FinPerm.swap p.1 c) p.2) = Y.act (FinPerm.swap p.1 c) (f.hom p.2) := by
+    simpa only [ConcreteCategory.comp_apply] using
+      ConcreteCategory.congr_hom (f.comm (FinPerm.swap p.1 c)) p.2
+  have fq : f.hom (X.act (FinPerm.swap q.1 c) q.2) = Y.act (FinPerm.swap q.1 c) (f.hom q.2) := by
+    simpa only [ConcreteCategory.comp_apply] using
+      ConcreteCategory.congr_hom (f.comm (FinPerm.swap q.1 c)) q.2
   rw [← fp, ← fq, e]
 
 /-- The action of atom abstraction on a morphism `f : X ⟶ Y` of `GSetFin`s. -/
 def absHomFin {X Y : GSetFin} (f : X ⟶ Y) : absGSetFin X ⟶ absGSetFin Y where
-  hom := Quotient.map (fun p => (p.1, f.hom p.2)) (fun _ _ h => AbsRelFin_map f h)
+  hom := TypeCat.ofHom (Quotient.map (fun p => (p.1, f.hom p.2)) (fun _ _ h => AbsRelFin_map f h))
   comm := by
     intro π
-    funext q
+    apply ConcreteCategory.hom_ext; intro q
     induction q using Quotient.inductionOn with
     | _ p =>
-      show Quotient.mk (absSetoidFin Y) (π p.1, f.hom (X.ρ π p.2))
-        = Quotient.mk (absSetoidFin Y) (π p.1, Y.ρ π (f.hom p.2))
-      have hc : f.hom (X.ρ π p.2) = Y.ρ π (f.hom p.2) := congrFun (f.comm π) p.2
+      show Quotient.mk (absSetoidFin Y) (π p.1, f.hom (X.act π p.2))
+        = Quotient.mk (absSetoidFin Y) (π p.1, Y.act π (f.hom p.2))
+      have hc : f.hom (X.act π p.2) = Y.act π (f.hom p.2) := by
+        simpa only [ConcreteCategory.comp_apply] using ConcreteCategory.congr_hom (f.comm π) p.2
       rw [hc]
 
 /-- Atom abstraction as an endofunctor on `NomFin`. The `FinPerm` copy of `absF`. -/
@@ -230,13 +233,13 @@ def absFinF : NomFin ⥤ NomFin where
   map_id X := by
     apply InducedCategory.hom_ext
     apply Action.Hom.ext
-    funext q
+    apply ConcreteCategory.hom_ext; intro q
     induction q using Quotient.inductionOn with
     | _ p => rfl
   map_comp {X Y Z} f g := by
     apply InducedCategory.hom_ext
     apply Action.Hom.ext
-    funext q
+    apply ConcreteCategory.hom_ext; intro q
     induction q using Quotient.inductionOn with
     | _ p => rfl
 
@@ -280,7 +283,7 @@ theorem absRelFin_res_of {X : GSet} {p q : CatCrypt.Nominal.Atom × X.V}
   have e2 : Equiv.swap (coreAtomEquiv q.1) d
       = finPermToPerm (FinPerm.swap q.1 (coreAtomEquiv.symm d)) := by
     rw [finPermToPerm_swap, Equiv.apply_symm_apply]
-  show X.ρ (Equiv.swap (coreAtomEquiv p.1) d) p.2 = X.ρ (Equiv.swap (coreAtomEquiv q.1) d) q.2
+  show X.act (Equiv.swap (coreAtomEquiv p.1) d) p.2 = X.act (Equiv.swap (coreAtomEquiv q.1) d) q.2
   rw [e1, e2]
   exact hkey
 
@@ -294,8 +297,8 @@ theorem absRelFin_res_symm {X : GSet} {p q : Nominal.Atom × X.V} (h : AbsRel X 
     intro hmem
     exact hc' (by simpa using Finset.mem_image_of_mem coreAtomEquiv.symm hmem)
   have hkey := hs (coreAtomEquiv c') hpre
-  show X.ρ (finPermToPerm (FinPerm.swap (coreAtomEquiv.symm p.1) c')) p.2
-     = X.ρ (finPermToPerm (FinPerm.swap (coreAtomEquiv.symm q.1) c')) q.2
+  show X.act (finPermToPerm (FinPerm.swap (coreAtomEquiv.symm p.1) c')) p.2
+     = X.act (finPermToPerm (FinPerm.swap (coreAtomEquiv.symm q.1) c')) q.2
   rw [finPermToPerm_swap, finPermToPerm_swap, Equiv.apply_symm_apply, Equiv.apply_symm_apply]
   exact hkey
 
@@ -330,14 +333,14 @@ noncomputable def absIntertwineGSetIso (X : Nom) :
   Action.mkIso (Equiv.toIso (absIntertwineEquiv X.obj))
     (by
       intro τ
-      funext q
+      apply ConcreteCategory.hom_ext; intro q
       induction q using Quotient.inductionOn with
       | _ p =>
         obtain ⟨a, x⟩ := p
         show Quotient.mk (absSetoid X.obj)
-              (coreAtomEquiv (τ a), X.obj.ρ (finPermToPerm τ) x)
+              (coreAtomEquiv (τ a), X.obj.act (finPermToPerm τ) x)
             = Quotient.mk (absSetoid X.obj)
-              (finPermToPerm τ (coreAtomEquiv a), X.obj.ρ (finPermToPerm τ) x)
+              (finPermToPerm τ (coreAtomEquiv a), X.obj.act (finPermToPerm τ) x)
         have hkey : coreAtomEquiv (τ a) = finPermToPerm τ (coreAtomEquiv a) := by
           simp [finPermToPerm, coreAtomEquiv, Equiv.permCongr_apply]
         rw [hkey])
@@ -357,7 +360,7 @@ noncomputable def absIntertwine : res ⋙ absFinF ≅ absF ⋙ res :=
       intro X Y f
       apply ObjectProperty.hom_ext
       apply Action.Hom.ext
-      funext q
+      apply ConcreteCategory.hom_ext; intro q
       induction q using Quotient.inductionOn with
       | _ p => rfl)
 

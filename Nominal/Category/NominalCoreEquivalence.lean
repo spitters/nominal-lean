@@ -78,10 +78,21 @@ open CatCrypt.Nominal
 core atoms. This is the categorical home of "core nominal sets". -/
 abbrev GSetFin : Type _ := Action (Type) CatCrypt.Nominal.FinPerm
 
+namespace GSetFin
+
+variable (X : GSetFin)
+
+/-- Apply a `FinPerm`-set action to a point. As with `GSet.act`, the `End`-valued action
+`X.ρ τ : End X.V` is a categorical endomorphism in Lean 4.30, so applying it to a point goes
+through `ConcreteCategory.hom`. -/
+abbrev act (τ : CatCrypt.Nominal.FinPerm) (x : X.V) : X.V := ConcreteCategory.hom (X.ρ τ) x
+
+end GSetFin
+
 /-- `s` **supports** `x` for the `FinPerm`-action: every finitely-supported permutation fixing `s`
 pointwise fixes `x`. The `FinPerm`-side mirror of `Nominal.Supports`. -/
 def SupportsFin (X : GSetFin) (s : Finset CatCrypt.Nominal.Atom) (x : X.V) : Prop :=
-  ∀ τ : CatCrypt.Nominal.FinPerm, (∀ a ∈ s, τ a = a) → X.ρ τ x = x
+  ∀ τ : CatCrypt.Nominal.FinPerm, (∀ a ∈ s, τ a = a) → X.act τ x = x
 
 /-- A `FinPerm`-set has finite support everywhere. The mirror of `IsNominal`. -/
 def IsNominalFin (X : GSetFin) : Prop := ∀ x : X.V, ∃ s : Finset CatCrypt.Nominal.Atom, SupportsFin X s x
@@ -103,17 +114,17 @@ analogue of `NominalCoreBridge.nomSet_act_eq_of_agree`, and drives the fullness 
 /-- If `s` supports `x` and `π₁`, `π₂` agree on `s`, then they act identically on `x`. -/
 lemma act_eq_of_supports {X : GSet} {s : Finset Nominal.Atom} {x : X.V}
     (hs : Supports X s x) {π₁ π₂ : PermAtom} (h : ∀ a ∈ s, π₁ a = π₂ a) :
-    X.ρ π₁ x = X.ρ π₂ x := by
+    X.act π₁ x = X.act π₂ x := by
   have hfix : ∀ a ∈ s, (π₁⁻¹ * π₂) a = a := by
     intro a ha
     simp only [Equiv.Perm.mul_apply]
     rw [← h a ha]
     simp
   have key := hs (π₁⁻¹ * π₂) hfix
-  calc X.ρ π₁ x
-      = X.ρ π₁ (X.ρ (π₁⁻¹ * π₂) x) := by rw [key]
-    _ = X.ρ (π₁ * (π₁⁻¹ * π₂)) x := (GSet.act_mul X _ _ x).symm
-    _ = X.ρ π₂ x := by rw [← mul_assoc, mul_inv_cancel, one_mul]
+  calc X.act π₁ x
+      = X.act π₁ (X.act (π₁⁻¹ * π₂) x) := by rw [key]
+    _ = X.act (π₁ * (π₁⁻¹ * π₂)) x := (GSet.act_mul X _ _ x).symm
+    _ = X.act π₂ x := by rw [← mul_assoc, mul_inv_cancel, one_mul]
 
 /-! ## Step 2 — the restriction functor `res : Nom ⥤ NomFin`
 
@@ -132,7 +143,7 @@ lemma isNominalFin_resGSet {X : GSet} (hX : IsNominal X) :
   obtain ⟨s, hs⟩ := hX x
   refine ⟨s.image coreAtomEquiv.symm, ?_⟩
   intro τ hτ
-  show X.ρ (finPermToPerm τ) x = x
+  show X.act (finPermToPerm τ) x = x
   refine hs (finPermToPerm τ) ?_
   intro b hb
   have hmem : coreAtomEquiv.symm b ∈ s.image coreAtomEquiv.symm :=
@@ -174,19 +185,19 @@ noncomputable def fullPreimage {X Y : Nom} (g : res.obj X ⟶ res.obj Y) :
     { hom := g.hom.hom
       comm := by
         intro π
-        funext x
-        show g.hom.hom (X.obj.ρ π x) = Y.obj.ρ π (g.hom.hom x)
+        apply ConcreteCategory.hom_ext; intro x
+        show g.hom.hom (X.obj.act π x) = Y.obj.act π (g.hom.hom x)
         obtain ⟨sx, hsx⟩ := X.property x
         obtain ⟨sy, hsy⟩ := Y.property (g.hom.hom x)
         obtain ⟨τ, hτ⟩ := finPermToPerm_agree_on_finset π (sx ∪ sy)
-        have hax : X.obj.ρ π x = X.obj.ρ (finPermToPerm τ) x :=
+        have hax : X.obj.act π x = X.obj.act (finPermToPerm τ) x :=
           act_eq_of_supports hsx (fun a ha => (hτ a (Finset.mem_union_left sy ha)).symm)
-        have hay : Y.obj.ρ (finPermToPerm τ) (g.hom.hom x)
-            = Y.obj.ρ π (g.hom.hom x) :=
+        have hay : Y.obj.act (finPermToPerm τ) (g.hom.hom x)
+            = Y.obj.act π (g.hom.hom x) :=
           act_eq_of_supports hsy (fun a ha => hτ a (Finset.mem_union_right sx ha))
-        have hcomm : g.hom.hom (X.obj.ρ (finPermToPerm τ) x)
-            = Y.obj.ρ (finPermToPerm τ) (g.hom.hom x) :=
-          congrFun (g.hom.comm τ) x
+        have hcomm : g.hom.hom (X.obj.act (finPermToPerm τ) x)
+            = Y.obj.act (finPermToPerm τ) (g.hom.hom x) := by
+          simpa only [ConcreteCategory.comp_apply] using ConcreteCategory.congr_hom (g.hom.comm τ) x
         rw [hax, hcomm, hay] }
 
 instance instFaithfulRes : res.Faithful where
@@ -211,25 +222,25 @@ objects supply it canonically via `NomSet.supp_equivariant`. -/
 
 /-- Left-action law for a `FinPerm`-set: products act by composition. -/
 lemma GSetFin.act_mul (X : GSetFin) (a b : CatCrypt.Nominal.FinPerm) (x : X.V) :
-    X.ρ (a * b) x = X.ρ a (X.ρ b x) := by rw [map_mul]; rfl
+    X.act (a * b) x = X.act a (X.act b x) := by simp [GSetFin.act, map_mul]
 
 /-- Two finitely-supported permutations agreeing on a support of `x` act identically on `x`
 (`FinPerm`-side; the `GSetFin` analogue of `NominalCoreBridge.nomSet_act_eq_of_agree`). -/
 lemma actFin_eq_of_agree {X : GSetFin} {τ₁ τ₂ : CatCrypt.Nominal.FinPerm}
     {s : Finset CatCrypt.Nominal.Atom} {x : X.V}
     (hsupp : SupportsFin X s x) (h : ∀ a ∈ s, τ₁ a = τ₂ a) :
-    X.ρ τ₁ x = X.ρ τ₂ x := by
+    X.act τ₁ x = X.act τ₂ x := by
   have hfix : ∀ a ∈ s, (τ₁⁻¹ * τ₂) a = a := by
     intro a ha
     have e : (τ₁⁻¹ * τ₂) a = (τ₁⁻¹ * τ₁) a := by
       simp only [CatCrypt.Nominal.FinPerm.mul_apply]; rw [← h a ha]
     rw [e, inv_mul_cancel, CatCrypt.Nominal.FinPerm.one_apply]
   have key := hsupp (τ₁⁻¹ * τ₂) hfix
-  have : X.ρ τ₂ x = X.ρ τ₁ x := by
-    calc X.ρ τ₂ x
-        = X.ρ (τ₁ * (τ₁⁻¹ * τ₂)) x := by rw [← mul_assoc, mul_inv_cancel, one_mul]
-      _ = X.ρ τ₁ (X.ρ (τ₁⁻¹ * τ₂) x) := GSetFin.act_mul X _ _ x
-      _ = X.ρ τ₁ x := by rw [key]
+  have : X.act τ₂ x = X.act τ₁ x := by
+    calc X.act τ₂ x
+        = X.act (τ₁ * (τ₁⁻¹ * τ₂)) x := by rw [← mul_assoc, mul_inv_cancel, one_mul]
+      _ = X.act τ₁ (X.act (τ₁⁻¹ * τ₂) x) := GSetFin.act_mul X _ _ x
+      _ = X.act τ₁ x := by rw [key]
   exact this.symm
 
 /-- The reconstructed full-`PermAtom` action on a finitely-supported `FinPerm`-set with an
@@ -237,31 +248,31 @@ equivariant support function: act by any finitely-supported permutation agreeing
 chosen support. -/
 noncomputable def extGSet (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.Atom)
     (hsupp : ∀ x, SupportsFin X (suppOf x) x)
-    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.ρ τ x) = (suppOf x).image (τ ·)) :
+    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·)) :
     GSet where
   V := X.V
   ρ :=
-    { toFun := fun π x => X.ρ (extendPerm (fromPermℕ π) (suppOf x)) x
+    { toFun := fun π => TypeCat.ofHom (fun x => X.act (extendPerm (fromPermℕ π) (suppOf x)) x)
       map_one' := by
-        funext x
-        show X.ρ (extendPerm (fromPermℕ 1) (suppOf x)) x = x
+        apply ConcreteCategory.hom_ext; intro x
+        show X.act (extendPerm (fromPermℕ 1) (suppOf x)) x = x
         rw [fromPermℕ_one]
         refine hsupp x _ ?_
         intro a ha
         rw [extendPerm_spec 1 _ a ha]; rfl
       map_mul' := fun π σ => by
-        funext x
-        show X.ρ (extendPerm (fromPermℕ (π * σ)) (suppOf x)) x
-            = X.ρ (extendPerm (fromPermℕ π)
-                (suppOf (X.ρ (extendPerm (fromPermℕ σ) (suppOf x)) x)))
-              (X.ρ (extendPerm (fromPermℕ σ) (suppOf x)) x)
+        apply ConcreteCategory.hom_ext; intro x
+        show X.act (extendPerm (fromPermℕ (π * σ)) (suppOf x)) x
+            = X.act (extendPerm (fromPermℕ π)
+                (suppOf (X.act (extendPerm (fromPermℕ σ) (suppOf x)) x)))
+              (X.act (extendPerm (fromPermℕ σ) (suppOf x)) x)
         set σ' := extendPerm (fromPermℕ σ) (suppOf x) with hσ'
         rw [← GSetFin.act_mul]
         refine actFin_eq_of_agree (hsupp x) ?_
         intro a ha
         rw [extendPerm_spec (fromPermℕ (π * σ)) _ a ha, fromPermℕ_mul]
         have hσa : σ' a = fromPermℕ σ a := extendPerm_spec (fromPermℕ σ) _ a ha
-        have hmem : fromPermℕ σ a ∈ suppOf (X.ρ σ' x) := by
+        have hmem : fromPermℕ σ a ∈ suppOf (X.act σ' x) := by
           rw [hequiv x σ', ← hσa]
           exact Finset.mem_image_of_mem _ ha
         simp only [CatCrypt.Nominal.FinPerm.mul_apply]
@@ -270,11 +281,11 @@ noncomputable def extGSet (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nomina
 /-- The transported chosen support supports `x` for the reconstructed full-`PermAtom` action. -/
 lemma extGSet_supports (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.Atom)
     (hsupp : ∀ x, SupportsFin X (suppOf x) x)
-    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.ρ τ x) = (suppOf x).image (τ ·))
+    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·))
     (x : X.V) :
     Supports (extGSet X suppOf hsupp hequiv) ((suppOf x).image coreAtomEquiv) x := by
   intro π hπ
-  show X.ρ (extendPerm (fromPermℕ π) (suppOf x)) x = x
+  show X.act (extendPerm (fromPermℕ π) (suppOf x)) x = x
   refine hsupp x _ ?_
   intro a ha
   have hmem : coreAtomEquiv a ∈ (suppOf x).image coreAtomEquiv := Finset.mem_image_of_mem _ ha
@@ -285,14 +296,14 @@ lemma extGSet_supports (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.A
 /-- The reconstructed action is nominal (finitely supported). -/
 lemma extGSet_isNominal (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.Atom)
     (hsupp : ∀ x, SupportsFin X (suppOf x) x)
-    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.ρ τ x) = (suppOf x).image (τ ·)) :
+    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·)) :
     IsNominal (extGSet X suppOf hsupp hequiv) :=
   fun x => ⟨_, extGSet_supports X suppOf hsupp hequiv x⟩
 
 /-- The object-level extension `ext` into `Nom`, for a `FinPerm`-set with an equivariant support. -/
 noncomputable def extObj (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.Atom)
     (hsupp : ∀ x, SupportsFin X (suppOf x) x)
-    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.ρ τ x) = (suppOf x).image (τ ·)) : Nom :=
+    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·)) : Nom :=
   Nom.of (extGSet X suppOf hsupp hequiv) (extGSet_isNominal X suppOf hsupp hequiv)
 
 /-! ## Step 4/5 — the extension on core objects, and the round-trip iso
@@ -305,9 +316,9 @@ exhibit the round-trip `res.obj (coreToNom α) ≅ coreObjFin α`. -/
 noncomputable def coreGSetFin (α : Type) [NomSet α] : GSetFin where
   V := α
   ρ :=
-    { toFun := fun τ x => τ • x
-      map_one' := funext fun x => one_smul _ x
-      map_mul' := fun a b => funext fun x => mul_smul a b x }
+    { toFun := fun τ => TypeCat.ofHom (fun x => τ • x)
+      map_one' := by apply ConcreteCategory.hom_ext; intro x; exact one_smul _ x
+      map_mul' := fun a b => by apply ConcreteCategory.hom_ext; intro x; exact mul_smul a b x }
 
 /-- A core nominal set is finitely supported for its `FinPerm`-action, via `NomSet.supp`. -/
 lemma coreGSetFin_isNominalFin (α : Type) [NomSet α] : IsNominalFin (coreGSetFin α) :=
@@ -337,14 +348,14 @@ full-`PermAtom` action along `finPermToPerm` recovers the original `FinPerm`-act
 carrier. -/
 noncomputable def resExtGSetIso (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.Atom)
     (hsupp : ∀ x, SupportsFin X (suppOf x) x)
-    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.ρ τ x) = (suppOf x).image (τ ·)) :
+    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·)) :
     resGSet.obj (extGSet X suppOf hsupp hequiv) ≅ X :=
   Action.mkIso (Iso.refl _)
     (by
       intro τ
-      funext x
-      simp only [Iso.refl_hom, types_id_apply, types_comp_apply]
-      show X.ρ (extendPerm (fromPermℕ (finPermToPerm τ)) (suppOf x)) x = X.ρ τ x
+      apply ConcreteCategory.hom_ext; intro x
+      simp only [Iso.refl_hom, Category.comp_id, Category.id_comp]
+      show X.act (extendPerm (fromPermℕ (finPermToPerm τ)) (suppOf x)) x = X.act τ x
       rw [fromPermℕ_finPermToPerm]
       refine actFin_eq_of_agree (hsupp x) ?_
       intro a ha
@@ -358,7 +369,7 @@ for every object that carries an equivariant support (the other direction, and p
 functor on all of `NomFin`, is the least-support residual documented in the module header). -/
 noncomputable def resExtIso (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.Atom)
     (hsupp : ∀ x, SupportsFin X (suppOf x) x)
-    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.ρ τ x) = (suppOf x).image (τ ·)) :
+    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·)) :
     res.obj (extObj X suppOf hsupp hequiv) ≅ NomFin.of X (fun x => ⟨suppOf x, hsupp x⟩) :=
   ObjectProperty.isoMk _ (resExtGSetIso X suppOf hsupp hequiv)
 

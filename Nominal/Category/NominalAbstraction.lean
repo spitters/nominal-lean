@@ -69,14 +69,14 @@ namespace Nominal
 /-- If two permutations `g` and `h` agree on a support `s` of `x`, they act equally on `x`. -/
 lemma act_eq_of_agree {X : GSet} {s : Finset Atom} {x : X.V}
     (hs : Supports X s x) {g h : PermAtom} (hgh : ∀ a ∈ s, g a = h a) :
-    X.ρ g x = X.ρ h x := by
+    X.act g x = X.act h x := by
   have key : ∀ a ∈ s, (h⁻¹ * g) a = a := by
     intro a ha
     rw [Equiv.Perm.mul_apply, hgh a ha]; simp
-  have hx : X.ρ (h⁻¹ * g) x = x := hs _ key
-  calc X.ρ g x = X.ρ (h * (h⁻¹ * g)) x := by rw [mul_inv_cancel_left]
-    _ = X.ρ h (X.ρ (h⁻¹ * g) x) := GSet.act_mul X h (h⁻¹ * g) x
-    _ = X.ρ h x := by rw [hx]
+  have hx : X.act (h⁻¹ * g) x = x := hs _ key
+  calc X.act g x = X.act (h * (h⁻¹ * g)) x := by rw [mul_inv_cancel_left]
+    _ = X.act h (X.act (h⁻¹ * g) x) := GSet.act_mul X h (h⁻¹ * g) x
+    _ = X.act h x := by rw [hx]
 
 /-- Conjugation of a transposition through a permutation:
 `swap (π a) (π b) * π = π * swap a b`. -/
@@ -103,7 +103,7 @@ abbrev atomObj' : Nom := atomObj
 /-- α-equivalence on representatives `Atom × X.V`, cofinite form: the swapped representatives
 agree at every atom outside some finite set. -/
 def AbsRel (X : GSet) (p q : Atom × X.V) : Prop :=
-  ∃ s : Finset Atom, ∀ c ∉ s, X.ρ (Equiv.swap p.1 c) p.2 = X.ρ (Equiv.swap q.1 c) q.2
+  ∃ s : Finset Atom, ∀ c ∉ s, X.act (Equiv.swap p.1 c) p.2 = X.act (Equiv.swap q.1 c) q.2
 
 namespace AbsRel
 
@@ -135,7 +135,7 @@ def absSetoid (X : GSet) : Setoid (Atom × X.V) where
 
 /-- α-equivalence is preserved by the diagonal permutation action. -/
 theorem AbsRel_smul {X : GSet} (π : PermAtom) {p q : Atom × X.V} (h : AbsRel X p q) :
-    AbsRel X (π p.1, X.ρ π p.2) (π q.1, X.ρ π q.2) := by
+    AbsRel X (π p.1, X.act π p.2) (π q.1, X.act π q.2) := by
   obtain ⟨s, hs⟩ := h
   refine ⟨s.image π, fun d hd => ?_⟩
   -- `d` outside `π '' s` means `π⁻¹ d ∉ s`
@@ -146,37 +146,38 @@ theorem AbsRel_smul {X : GSet} (π : PermAtom) {p q : Atom × X.V} (h : AbsRel X
       simpa [this] using Finset.mem_image_of_mem π hmem)
   have hkey := hs (π⁻¹ d) hc
   have hdc : π (π⁻¹ d) = d := by simp
-  calc X.ρ (Equiv.swap (π p.1) d) (X.ρ π p.2)
-      = X.ρ (Equiv.swap (π p.1) (π (π⁻¹ d)) * π) p.2 := by
+  calc X.act (Equiv.swap (π p.1) d) (X.act π p.2)
+      = X.act (Equiv.swap (π p.1) (π (π⁻¹ d)) * π) p.2 := by
         rw [hdc, ← GSet.act_mul]
-    _ = X.ρ (π * Equiv.swap p.1 (π⁻¹ d)) p.2 := by rw [swap_mul_perm]
-    _ = X.ρ π (X.ρ (Equiv.swap p.1 (π⁻¹ d)) p.2) := GSet.act_mul X _ _ _
-    _ = X.ρ π (X.ρ (Equiv.swap q.1 (π⁻¹ d)) q.2) := by rw [hkey]
-    _ = X.ρ (π * Equiv.swap q.1 (π⁻¹ d)) q.2 := (GSet.act_mul X _ _ _).symm
-    _ = X.ρ (Equiv.swap (π q.1) (π (π⁻¹ d)) * π) q.2 := by rw [swap_mul_perm]
-    _ = X.ρ (Equiv.swap (π q.1) d) (X.ρ π q.2) := by rw [hdc, ← GSet.act_mul]
+    _ = X.act (π * Equiv.swap p.1 (π⁻¹ d)) p.2 := by rw [swap_mul_perm]
+    _ = X.act π (X.act (Equiv.swap p.1 (π⁻¹ d)) p.2) := GSet.act_mul X _ _ _
+    _ = X.act π (X.act (Equiv.swap q.1 (π⁻¹ d)) q.2) := by rw [hkey]
+    _ = X.act (π * Equiv.swap q.1 (π⁻¹ d)) q.2 := (GSet.act_mul X _ _ _).symm
+    _ = X.act (Equiv.swap (π q.1) (π (π⁻¹ d)) * π) q.2 := by rw [swap_mul_perm]
+    _ = X.act (Equiv.swap (π q.1) d) (X.act π q.2) := by rw [hdc, ← GSet.act_mul]
 
 /-! ## The abstraction `GSet` -/
 
 /-- The underlying `GSet` of `[𝔸]X`: the quotient of `Atom × X.V` by α-equivalence, with the
-diagonal action `π • ⟦(a, x)⟧ = ⟦(π a, X.ρ π x)⟧`. -/
+diagonal action `π • ⟦(a, x)⟧ = ⟦(π a, X.act π x)⟧`. -/
 def absGSet (X : GSet) : GSet where
   V := Quotient (absSetoid X)
   ρ :=
-    { toFun := fun π => Quotient.map (fun p => (π p.1, X.ρ π p.2)) (fun _ _ h => AbsRel_smul π h)
+    { toFun := fun π => TypeCat.ofHom
+        (Quotient.map (fun p => (π p.1, X.act π p.2)) (fun _ _ h => AbsRel_smul π h))
       map_one' := by
-        funext q
+        apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
-          show Quotient.mk (absSetoid X) ((1 : PermAtom) p.1, X.ρ (1 : PermAtom) p.2)
+          show Quotient.mk (absSetoid X) ((1 : PermAtom) p.1, X.act (1 : PermAtom) p.2)
             = Quotient.mk (absSetoid X) p
           rw [Equiv.Perm.one_apply, GSet.act_one]
       map_mul' := fun a b => by
-        funext q
+        apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
-          show Quotient.mk (absSetoid X) ((a * b) p.1, X.ρ (a * b) p.2)
-            = Quotient.mk (absSetoid X) (a (b p.1), X.ρ a (X.ρ b p.2))
+          show Quotient.mk (absSetoid X) ((a * b) p.1, X.act (a * b) p.2)
+            = Quotient.mk (absSetoid X) (a (b p.1), X.act a (X.act b p.2))
           rw [GSet.act_mul]; rfl }
 
 /-- Abstraction point: the class of `(a, x)` in `[𝔸]X`. -/
@@ -184,21 +185,21 @@ def absPt (X : GSet) (a : Atom) (x : X.V) : (absGSet X).V :=
   Quotient.mk (absSetoid X) (a, x)
 
 @[simp] lemma absGSet_ρ_mk (X : GSet) (π : PermAtom) (a : Atom) (x : X.V) :
-    (absGSet X).ρ π (absPt X a x) = absPt X (π a) (X.ρ π x) := rfl
+    (absGSet X).act π (absPt X a x) = absPt X (π a) (X.act π x) := rfl
 
 /-- **Support-shrink**: if `s` supports `x`, then `s \ {a}` supports the class of `(a, x)`.
 This is the crux finite-support lemma for atom abstraction. -/
 theorem absGSet_supports {X : GSet} {s : Finset Atom} {a : Atom} {x : X.V}
     (hs : Supports X s x) : Supports (absGSet X) (s \ {a}) (absPt X a x) := by
   intro π hπ
-  show Quotient.mk (absSetoid X) (π a, X.ρ π x) = Quotient.mk (absSetoid X) (a, x)
+  show Quotient.mk (absSetoid X) (π a, X.act π x) = Quotient.mk (absSetoid X) (a, x)
   apply Quotient.sound
-  -- Goal: AbsRel X (π a, X.ρ π x) (a, x).  Witness: s ∪ {a, π a}.
+  -- Goal: AbsRel X (π a, X.act π x) (a, x).  Witness: s ∪ {a, π a}.
   refine ⟨insert a (insert (π a) s), fun c hc => ?_⟩
   simp only [Finset.mem_insert, not_or] at hc
   obtain ⟨hca, hcπa, hcs⟩ := hc
   -- reduce to a permutation-agreement statement on `s`
-  show X.ρ (Equiv.swap (π a) c) (X.ρ π x) = X.ρ (Equiv.swap a c) x
+  show X.act (Equiv.swap (π a) c) (X.act π x) = X.act (Equiv.swap a c) x
   rw [← GSet.act_mul]
   apply act_eq_of_agree hs
   intro d hd
@@ -238,23 +239,26 @@ theorem AbsRel_map {X Y : GSet} (f : X ⟶ Y) {p q : Atom × X.V} (h : AbsRel X 
   refine ⟨s, fun c hc => ?_⟩
   have e := hs c hc
   -- push `f.hom` through the swap actions via equivariance `f.comm`
-  have fp : f.hom (X.ρ (Equiv.swap p.1 c) p.2) = Y.ρ (Equiv.swap p.1 c) (f.hom p.2) :=
-    congrFun (f.comm (Equiv.swap p.1 c)) p.2
-  have fq : f.hom (X.ρ (Equiv.swap q.1 c) q.2) = Y.ρ (Equiv.swap q.1 c) (f.hom q.2) :=
-    congrFun (f.comm (Equiv.swap q.1 c)) q.2
+  have fp : f.hom (X.act (Equiv.swap p.1 c) p.2) = Y.act (Equiv.swap p.1 c) (f.hom p.2) := by
+    simpa only [ConcreteCategory.comp_apply] using
+      ConcreteCategory.congr_hom (f.comm (Equiv.swap p.1 c)) p.2
+  have fq : f.hom (X.act (Equiv.swap q.1 c) q.2) = Y.act (Equiv.swap q.1 c) (f.hom q.2) := by
+    simpa only [ConcreteCategory.comp_apply] using
+      ConcreteCategory.congr_hom (f.comm (Equiv.swap q.1 c)) q.2
   rw [← fp, ← fq, e]
 
 /-- The action of atom abstraction on a morphism `f : X ⟶ Y` of `GSet`s. -/
 def absHom {X Y : GSet} (f : X ⟶ Y) : absGSet X ⟶ absGSet Y where
-  hom := Quotient.map (fun p => (p.1, f.hom p.2)) (fun _ _ h => AbsRel_map f h)
+  hom := TypeCat.ofHom (Quotient.map (fun p => (p.1, f.hom p.2)) (fun _ _ h => AbsRel_map f h))
   comm := by
     intro π
-    funext q
+    apply ConcreteCategory.hom_ext; intro q
     induction q using Quotient.inductionOn with
     | _ p =>
-      show Quotient.mk (absSetoid Y) (π p.1, f.hom (X.ρ π p.2))
-        = Quotient.mk (absSetoid Y) (π p.1, Y.ρ π (f.hom p.2))
-      have hc : f.hom (X.ρ π p.2) = Y.ρ π (f.hom p.2) := congrFun (f.comm π) p.2
+      show Quotient.mk (absSetoid Y) (π p.1, f.hom (X.act π p.2))
+        = Quotient.mk (absSetoid Y) (π p.1, Y.act π (f.hom p.2))
+      have hc : f.hom (X.act π p.2) = Y.act π (f.hom p.2) := by
+        simpa only [ConcreteCategory.comp_apply] using ConcreteCategory.congr_hom (f.comm π) p.2
       rw [hc]
 
 @[simp] lemma absHom_mk {X Y : GSet} (f : X ⟶ Y) (a : Atom) (x : X.V) :
@@ -267,13 +271,13 @@ def absF : Nom ⥤ Nom where
   map_id X := by
     apply InducedCategory.hom_ext
     apply Action.Hom.ext
-    funext q
+    apply ConcreteCategory.hom_ext; intro q
     induction q using Quotient.inductionOn with
     | _ p => rfl
   map_comp {X Y Z} f g := by
     apply InducedCategory.hom_ext
     apply Action.Hom.ext
-    funext q
+    apply ConcreteCategory.hom_ext; intro q
     induction q using Quotient.inductionOn with
     | _ p => rfl
 
@@ -281,19 +285,19 @@ def absF : Nom ⥤ Nom where
 
 /-- Equivariance of the abstraction point: `π • ⟦(a, x)⟧ = ⟦(π a, π • x)⟧`. -/
 theorem absPt_equivariant (X : GSet) (π : PermAtom) (a : Atom) (x : X.V) :
-    (absGSet X).ρ π (absPt X a x) = absPt X (π a) (X.ρ π x) := rfl
+    (absGSet X).act π (absPt X a x) = absPt X (π a) (X.act π x) := rfl
 
 /-- **Renaming law** for the abstraction point: if `b` is fresh for `x` (outside a support `s`
 of `x`) and `b ≠ a`, then abstracting at `a` equals abstracting at `b` after swapping. -/
 theorem absPt_rename {X : GSet} {s : Finset Atom} {a b : Atom} {x : X.V}
     (hs : Supports X s x) (hb : b ∉ s) (hba : b ≠ a) :
-    absPt X a x = absPt X b (X.ρ (Equiv.swap a b) x) := by
+    absPt X a x = absPt X b (X.act (Equiv.swap a b) x) := by
   apply Quotient.sound
   -- Goal: AbsRel X (a, x) (b, swap a b • x).  Witness s ∪ {a, b}.
   refine ⟨insert a (insert b s), fun c hc => ?_⟩
   simp only [Finset.mem_insert, not_or] at hc
   obtain ⟨hca, hcb, hcs⟩ := hc
-  show X.ρ (Equiv.swap a c) x = X.ρ (Equiv.swap b c) (X.ρ (Equiv.swap a b) x)
+  show X.act (Equiv.swap a c) x = X.act (Equiv.swap b c) (X.act (Equiv.swap a b) x)
   rw [← GSet.act_mul]
   apply act_eq_of_agree hs
   intro d hd
