@@ -29,8 +29,10 @@ permutations, even though the set of atoms is infinite.
 
 ## References
 
-* Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013, Chapter 2.
-* Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598 — the SSProve `Nominal/` layer this development ports.
+* Pitts, *Nominal Sets: Names and Symmetry in Computer Science*,
+  Cambridge University Press, 2013, Chapter 2.
+* Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598 — the SSProve
+  `Nominal/` layer this development ports.
 * SSProve `theories/Crypt/nominal/Nominal.v`
 -/
 

@@ -66,7 +66,8 @@ lemma atomGSet_supports_mem {s : Finset Atom} {a : Atom} (hsupp : Supports atomG
   have hfix : atomGSet.act (Equiv.swap a c) a = a :=
     hsupp (Equiv.swap a c) (fun e he =>
       Equiv.swap_apply_of_ne_of_ne (fun hh => ha (hh ▸ he)) (fun hh => hcs (hh ▸ he)))
-  rw [show atomGSet.act (Equiv.swap a c) a = Equiv.swap a c a from rfl, Equiv.swap_apply_left] at hfix
+  rw [show atomGSet.act (Equiv.swap a c) a = Equiv.swap a c a from rfl,
+    Equiv.swap_apply_left] at hfix
   exact hca hfix
 
 /-- Every atom lies in its own least support. -/

@@ -25,7 +25,8 @@ supply of distinguishable names.
 ## References
 
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
-* Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598 — the SSProve `Nominal/` layer this development ports.
+* Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598 — the SSProve
+  `Nominal/` layer this development ports.
 * [SSProve Nominal Package](https://github.com/SSProve/ssprove)
 -/
 
