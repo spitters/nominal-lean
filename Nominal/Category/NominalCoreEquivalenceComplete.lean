@@ -87,8 +87,7 @@ lemma supportsFin_erase {X : GSetFin} {s t : Finset CatCrypt.Nominal.Atom} {x : 
       have hmem : a' ∈ s.erase a := Finset.mem_erase.mpr ⟨haa', ha's⟩
       have hfix : π a' = a' := hπ a' hmem
       have hpp : π a = π a' := by rw [← ha'def, hfix]
-      have heq : a = a' := π.val.injective (by simpa only [FinPerm.apply_def] using hpp)
-      exact haa' heq.symm
+      exact haa' (π.val.injective (by simpa only [FinPerm.apply_def] using hpp)).symm
     -- `ζ := swap a a' * π` fixes `s`, so `ζ • x = x`; hence `π • x = swap a a' • x`.
     have hzeta : X.act (FinPerm.swap a a' * π) x = x := by
       apply hs
@@ -270,11 +269,13 @@ noncomputable def extFunctor : NomFin ⥤ Nom where
           intro π
           apply ConcreteCategory.hom_ext; intro x
           show f.hom.hom (X.obj.act (extendPerm (fromPermℕ π) (suppFin X.property x)) x)
-              = Y.obj.act (extendPerm (fromPermℕ π) (suppFin Y.property (f.hom.hom x))) (f.hom.hom x)
+              = Y.obj.act (extendPerm (fromPermℕ π) (suppFin Y.property (f.hom.hom x)))
+                (f.hom.hom x)
           have hcomm : f.hom.hom (X.obj.act (extendPerm (fromPermℕ π) (suppFin X.property x)) x)
               = Y.obj.act (extendPerm (fromPermℕ π) (suppFin X.property x)) (f.hom.hom x) := by
             simpa only [ConcreteCategory.comp_apply] using
-              ConcreteCategory.congr_hom (f.hom.comm (extendPerm (fromPermℕ π) (suppFin X.property x))) x
+              ConcreteCategory.congr_hom
+                (f.hom.comm (extendPerm (fromPermℕ π) (suppFin X.property x))) x
           rw [hcomm]
           refine actFin_eq_of_agree (suppFin_supports Y.property (f.hom.hom x)) ?_
           intro a ha

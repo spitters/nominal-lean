@@ -32,8 +32,8 @@ genuine **natural isomorphism of functors** over the category `NomFin`. It suppl
    `finPermToPerm` and every swap used in the α-equivalence lives in `FinPerm` already (a `FinPerm`
    swap acts identically whether viewed in `FinPerm` or pushed to the full group via
    `finPermToPerm` — `finPermToPerm_swap`). The component bijection reindexes the atom coordinate
-   along `coreAtomEquiv`; equivariance and naturality both reduce to `Quotient.inductionOn` plus that
-   swap-transport identity.
+   along `coreAtomEquiv`; equivariance and naturality both reduce to `Quotient.inductionOn` plus
+   that swap-transport identity.
 
 3. `absPreservedBySchanuel : absF ⋙ res ≅ res ⋙ absFinF` — the headline restatement:
    atom abstraction is preserved by the Schanuel equivalence.
@@ -194,7 +194,8 @@ theorem absGSetFin_isNominalFin {X : GSetFin} (hX : IsNominalFin X) :
     exact ⟨s \ {p.1}, absGSetFin_supports hs⟩
 
 /-- Atom abstraction `[𝔸]X` on objects of `NomFin`. -/
-def absObjFin (X : NomFin) : NomFin := NomFin.of (absGSetFin X.obj) (absGSetFin_isNominalFin X.property)
+def absObjFin (X : NomFin) : NomFin :=
+  NomFin.of (absGSetFin X.obj) (absGSetFin_isNominalFin X.property)
 
 /-- α-equivalence is transported along a `FinPerm`-equivariant map (used for the map on
 morphisms). The mirror of `AbsRel_map`. -/
@@ -307,7 +308,8 @@ coordinate. -/
 noncomputable def absIntertwineEquiv (X : GSet) :
     (absGSetFin (resGSet.obj X)).V ≃ (resGSet.obj (absGSet X)).V where
   toFun := Quotient.map (fun p => (coreAtomEquiv p.1, p.2)) (fun _ _ h => absRelFin_res_of h)
-  invFun := Quotient.map (fun p => (coreAtomEquiv.symm p.1, p.2)) (fun _ _ h => absRelFin_res_symm h)
+  invFun := Quotient.map (fun p => (coreAtomEquiv.symm p.1, p.2))
+    (fun _ _ h => absRelFin_res_symm h)
   left_inv := by
     intro q
     induction q using Quotient.inductionOn with
