@@ -172,27 +172,12 @@ theorem trans {p q r : Atom × α} (hpq : AbsRel p q) (hqr : AbsRel q r) : AbsRe
   let S := NomSet.supp (p, q) ∪ NomSet.supp (q, r) ∪ {c₁, c₂}
   let d := Atom.fresh S
   have hd : d ∉ S := Atom.fresh_not_mem S
-  have hd_p1 : d ≠ p.1 := by
-    intro h; apply hd; exact Finset.mem_union_left _
-      (Finset.mem_union_left _ (Finset.mem_union_left _ (Finset.mem_union_left _
-        (h ▸ Finset.mem_singleton_self _))))
-  have hd_p2 : Fresh d p.2 := by
-    intro h; apply hd; exact Finset.mem_union_left _
-      (Finset.mem_union_left _ (Finset.mem_union_left _ (Finset.mem_union_right _ h)))
-  have hd_q1 : d ≠ q.1 := by
-    intro h; apply hd; exact Finset.mem_union_left _
-      (Finset.mem_union_left _ (Finset.mem_union_right _ (Finset.mem_union_left _
-        (h ▸ Finset.mem_singleton_self _))))
-  have hd_q2 : Fresh d q.2 := by
-    intro h; apply hd; exact Finset.mem_union_left _
-      (Finset.mem_union_left _ (Finset.mem_union_right _ (Finset.mem_union_right _ h)))
-  have hd_r1 : d ≠ r.1 := by
-    intro h; apply hd; exact Finset.mem_union_left _
-      (Finset.mem_union_right _ (Finset.mem_union_right _ (Finset.mem_union_left _
-        (h ▸ Finset.mem_singleton_self _))))
-  have hd_r2 : Fresh d r.2 := by
-    intro h; apply hd; exact Finset.mem_union_left _
-      (Finset.mem_union_right _ (Finset.mem_union_right _ (Finset.mem_union_right _ h)))
+  have hd_pq : Fresh d (p, q) :=
+    fun h => hd (Finset.mem_union_left _ (Finset.mem_union_left _ h))
+  have hd_qr : Fresh d (q, r) :=
+    fun h => hd (Finset.mem_union_left _ (Finset.mem_union_right _ h))
+  obtain ⟨hd_p1, hd_p2, hd_q1, hd_q2⟩ := fresh_pair d p q hd_pq
+  obtain ⟨-, -, hd_r1, hd_r2⟩ := fresh_pair d q r hd_qr
   refine ⟨d, mk_fresh_pair d p r hd_p1 hd_p2 hd_r1 hd_r2, ?_⟩
   rw [swap_fresh_conj p.1 c₁ d p.2 fp.2.1 hd_p2]
   rw [heq₁]
@@ -289,6 +274,7 @@ noncomputable instance instMulActionNameAbs {α : Type*} [NomSet α] :
     congr 1
     exact Prod.ext (by simp [FinPerm.apply_def]) (mul_smul _ _ _)
 
+/-- The permutation action commutes with `abs`: `π • abs a x = abs (π a) (π • x)`. -/
 @[simp]
 theorem smul_abs {α : Type*} [NomSet α] (π : FinPerm) (a : Atom) (x : α) :
     π • abs a x = abs (π • a) (π • x) := rfl
@@ -528,6 +514,7 @@ noncomputable def NameAbs.map {α β : Type*} [NomSet α] [NomSet β]
       · exact fun h => hf_pair.2.2.2 (supp_sub_of_equivariant f hf q.2 h)
     · rw [← hf, ← hf, heq])
 
+/-- Computation rule for `NameAbs.map`: it acts as `f` under the abstraction. -/
 theorem NameAbs.map_abs {α β : Type*} [NomSet α] [NomSet β]
     (f : α → β) (hf : Equivariant f) (a : Atom) (x : α) :
     NameAbs.map f hf (abs a x) = abs a (f x) := by

@@ -53,19 +53,15 @@ end Fresh
 noncomputable def freshFor {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : β) : Atom :=
   Atom.fresh (NomSet.supp x ∪ NomSet.supp y)
 
+/-- `freshFor x y` is fresh for `x`. -/
 theorem freshFor_not_in_supp_left {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : β) :
-    Fresh (freshFor x y) x := by
-  simp only [freshFor, Fresh]
-  intro h
-  apply Atom.fresh_not_mem
-  exact Finset.mem_union_left _ h
+    Fresh (freshFor x y) x :=
+  fun h => Atom.fresh_not_mem _ (Finset.mem_union_left _ h)
 
+/-- `freshFor x y` is fresh for `y`. -/
 theorem freshFor_not_in_supp_right {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : β) :
-    Fresh (freshFor x y) y := by
-  simp only [freshFor, Fresh]
-  intro h
-  apply Atom.fresh_not_mem
-  exact Finset.mem_union_right _ h
+    Fresh (freshFor x y) y :=
+  fun h => Atom.fresh_not_mem _ (Finset.mem_union_right _ h)
 
 /-- The offset of a finset: one plus the maximum value.
     This is used to generate fresh atoms. -/
@@ -75,11 +71,13 @@ noncomputable def offset (s : Finset Atom) : ℕ := Atom.offset s
     This is used to construct the fresh permutation. -/
 def atomShift (base : ℕ) (a : Atom) : Atom := ⟨base + a.val⟩
 
+/-- Shifting by a fixed base is injective. -/
 theorem atomShift_injective (base : ℕ) : Function.Injective (atomShift base) := by
   intro a b h
   simp only [atomShift, Atom.mk.injEq] at h
   exact Atom.ext (Nat.add_left_cancel h)
 
+/-- Once `base` clears the offset of `s`, shifting any atom lands outside `s`. -/
 theorem atomShift_image_disjoint {s : Finset Atom} {a : Atom} (_ha : a ∈ s) (base : ℕ)
     (hbase : Atom.offset s ≤ base) : atomShift base a ∉ s := by
   intro hmem
@@ -311,6 +309,15 @@ noncomputable def move {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : β)
 noncomputable def movePerm {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : β) : FinPerm :=
   freshMove x y
 
+/-- The fresh-atom offset is monotone in the finset: a larger set fixes a larger offset. -/
+private theorem offset_mono {s t : Finset Atom} (hst : s ⊆ t) :
+    Atom.offset s ≤ Atom.offset t := by
+  rcases s.eq_empty_or_nonempty with he | hs
+  · simp [Atom.offset, he]
+  · have ht := hs.mono hst
+    simp only [Atom.offset, hs, ht, ↓reduceDIte]
+    exact Nat.add_le_add_right (Finset.sup'_le hs _ fun a ha => Finset.le_sup' _ (hst ha)) 1
+
 /-- After applying move, the supports become disjoint.
 
     This is the key property from nominal set theory (Rocq: `fresh_disjoint`).
@@ -322,40 +329,11 @@ noncomputable def movePerm {α β : Type*} [NomSet α] [NomSet β] (x : α) (y :
 theorem move_disj {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : β) :
     Disj x (move x y) := by
   unfold Disj move freshMove
-  -- supp x is disjoint from supp(freshPerm (supp y) (offset(supp x ∪ supp y)) ∙ y)
-  -- because:
-  -- 1. All atoms in supp(freshPerm ... ∙ y) are ≥ offset(supp x ∪ supp y)
-  -- 2. All atoms in supp x are < offset(supp x ∪ supp y)
-  have hoff : Atom.offset (NomSet.supp x) ≤ Atom.offset (NomSet.supp x ∪ NomSet.supp y) := by
-    simp only [Atom.offset]
-    split_ifs with h1 h2 h2
-    · -- Both nonempty: x nonempty and union nonempty
-      have hsub : NomSet.supp x ⊆ NomSet.supp x ∪ NomSet.supp y := Finset.subset_union_left
-      -- For any a in supp x, a.val ≤ sup' (supp x) ≤ sup' (supp x ∪ supp y)
-      have hle_x : (NomSet.supp x).sup' h1 Atom.val ≤ (NomSet.supp x ∪ NomSet.supp y).sup' h2 Atom.val := by
-        apply Finset.sup'_le h1
-        intro a ha
-        exact Finset.le_sup' _ (hsub ha)
-      omega
-    · -- x nonempty, union empty - contradiction
-      simp only [Finset.not_nonempty_iff_eq_empty, Finset.union_eq_empty] at h2
-      simp only [h2.1, Finset.not_nonempty_empty] at h1
-    · omega
-    · omega
+  -- `freshPerm` sends `supp y` above `offset (supp x ∪ supp y)`, while every atom of
+  -- `supp x` sits strictly below it, so the two supports cannot meet.
   apply supp_act_freshPerm_disjoint
-  · simp only [Atom.offset]
-    split_ifs with h1 h2 h2
-    · have hsub : NomSet.supp y ⊆ NomSet.supp x ∪ NomSet.supp y := Finset.subset_union_right
-      have hle_y : (NomSet.supp y).sup' h1 Atom.val ≤ (NomSet.supp x ∪ NomSet.supp y).sup' h2 Atom.val := by
-        apply Finset.sup'_le h1
-        intro a ha
-        exact Finset.le_sup' _ (hsub ha)
-      omega
-    · simp only [Finset.not_nonempty_iff_eq_empty, Finset.union_eq_empty] at h2
-      simp only [h2.2, Finset.not_nonempty_empty] at h1
-    · omega
-    · omega
-  · exact hoff
+  · exact offset_mono Finset.subset_union_right
+  · exact offset_mono Finset.subset_union_left
 
 /-- movePerm doesn't move the first argument when supports are disjoint.
 
@@ -374,19 +352,7 @@ theorem movePerm_act_left {α β : Type*} [NomSet α] [NomSet β] (x : α) (y : 
   unfold movePerm freshMove
   -- freshPerm fixes atoms outside supp y (and not in the shift image)
   apply freshPerm_fix_outside
-  · -- offset (supp y) ≤ offset (supp x ∪ supp y)
-    simp only [Atom.offset]
-    split_ifs with h1 h2 h2
-    · have hsub : NomSet.supp y ⊆ NomSet.supp x ∪ NomSet.supp y := Finset.subset_union_right
-      have hle : (NomSet.supp y).sup' h1 Atom.val ≤ (NomSet.supp x ∪ NomSet.supp y).sup' h2 Atom.val := by
-        apply Finset.sup'_le h1
-        intro b hb
-        exact Finset.le_sup' _ (hsub hb)
-      omega
-    · simp only [Finset.not_nonempty_iff_eq_empty, Finset.union_eq_empty] at h2
-      simp only [h2.2, Finset.not_nonempty_empty] at h1
-    · omega
-    · omega
+  · exact offset_mono Finset.subset_union_right
   · exact ha_not_y
   · -- a is not a shift target: ∀ b ∈ supp y, atomShift base b ≠ a
     -- atomShift base b has value ≥ base = offset (supp x ∪ supp y)
@@ -412,12 +378,15 @@ namespace AlphaEquiv
 
 variable {α : Type*} [NomSet α]
 
+/-- Alpha-equivalence is reflexive. -/
 theorem refl (x : α) : x ≡α x := ⟨1, one_smul FinPerm x⟩
 
+/-- Alpha-equivalence is symmetric. -/
 theorem symm {x y : α} (h : x ≡α y) : y ≡α x := by
   obtain ⟨π, hπ⟩ := h
   exact ⟨π⁻¹, by rw [← hπ, inv_smul_smul]⟩
 
+/-- Alpha-equivalence is transitive. -/
 theorem trans {x y z : α} (hxy : x ≡α y) (hyz : y ≡α z) : x ≡α z := by
   obtain ⟨π₁, hπ₁⟩ := hxy
   obtain ⟨π₂, hπ₂⟩ := hyz
