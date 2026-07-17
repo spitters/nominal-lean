@@ -41,9 +41,9 @@ group actions that formalize nominal sets:
    **one of the two natural isos of the intended equivalence** (`res ∘ ext ≅ 𝟭`) for every such
    object.
 5. On core objects: `coreObjFin α` presents a core `NomSet α` as an object of `NomFin`;
-   `coreToNom_eq_extObj` shows the bridge `coreToNom` *is* `ext` applied to `coreObjFin α` (factoring
-   it as `NomSet α ⟶ NomFin ⟶ Nom`); and `coreResExtIso : res.obj (coreToNom α) ≅ coreObjFin α`
-   specializes the round-trip.
+   `coreToNom_eq_extObj` shows the bridge `coreToNom` *is* `ext` applied to `coreObjFin α`
+   (factoring it as `NomSet α ⟶ NomFin ⟶ Nom`); and
+   `coreResExtIso : res.obj (coreToNom α) ≅ coreObjFin α` specializes the round-trip.
 
 ## Honest boundary — what is *not* assembled (a precise residual, not asserted anywhere)
 
@@ -95,7 +95,8 @@ def SupportsFin (X : GSetFin) (s : Finset CatCrypt.Nominal.Atom) (x : X.V) : Pro
   ∀ τ : CatCrypt.Nominal.FinPerm, (∀ a ∈ s, τ a = a) → X.act τ x = x
 
 /-- A `FinPerm`-set has finite support everywhere. The mirror of `IsNominal`. -/
-def IsNominalFin (X : GSetFin) : Prop := ∀ x : X.V, ∃ s : Finset CatCrypt.Nominal.Atom, SupportsFin X s x
+def IsNominalFin (X : GSetFin) : Prop :=
+  ∀ x : X.V, ∃ s : Finset CatCrypt.Nominal.Atom, SupportsFin X s x
 
 /-- `NomFin`, the category of finitely-supported `FinPerm`-sets: the full subcategory cut out by
 `IsNominalFin`. The categorical form of core nominal sets. -/
@@ -213,10 +214,10 @@ instance instFullRes : res.Full where
 /-! ## Step 3 (object-level extension) — `ext` for objects carrying an equivariant support
 
 A `FinPerm`-set equipped with a *chosen equivariant* support function extends to a genuine
-`PermAtom`-action (the Schanuel reconstruction), generalizing `NominalCoreBridge.coreToGSet` from the
-`NomSet` data class to an arbitrary `GSetFin` object plus support data. The equivariance hypothesis
-`hequiv` is exactly what a general `NomFin` object does not carry (see the module residual); core
-objects supply it canonically via `NomSet.supp_equivariant`. -/
+`PermAtom`-action (the Schanuel reconstruction), generalizing `NominalCoreBridge.coreToGSet` from
+the `NomSet` data class to an arbitrary `GSetFin` object plus support data. The equivariance
+hypothesis `hequiv` is exactly what a general `NomFin` object does not carry (see the module
+residual); core objects supply it canonically via `NomSet.supp_equivariant`. -/
 
 /-- Left-action law for a `FinPerm`-set: products act by composition. -/
 lemma GSetFin.act_mul (X : GSetFin) (a b : CatCrypt.Nominal.FinPerm) (x : X.V) :
@@ -300,7 +301,8 @@ lemma extGSet_isNominal (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.
 /-- The object-level extension `ext` into `Nom`, for a `FinPerm`-set with an equivariant support. -/
 noncomputable def extObj (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nominal.Atom)
     (hsupp : ∀ x, SupportsFin X (suppOf x) x)
-    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·)) : Nom :=
+    (hequiv : ∀ x (τ : CatCrypt.Nominal.FinPerm), suppOf (X.act τ x) = (suppOf x).image (τ ·)) :
+    Nom :=
   Nom.of (extGSet X suppOf hsupp hequiv) (extGSet_isNominal X suppOf hsupp hequiv)
 
 /-! ## Step 4/5 — the extension on core objects, and the round-trip iso

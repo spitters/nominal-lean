@@ -133,6 +133,7 @@ example : Category Nom := inferInstance
 `𝟙ₙ`. Its single element is supported by `∅`. -/
 def unitGSet : GSet := Action.trivial PermAtom PUnit
 
+/-- The one-point nominal set is nominal: its unique element is supported by `∅`. -/
 lemma unitGSet_isNominal : IsNominal unitGSet := fun _ => ⟨∅, fun _ _ => rfl⟩
 
 /-- The monoidal unit `𝟙ₙ` of `Nom`. -/
@@ -150,6 +151,7 @@ def atomGSet : GSet where
       map_mul' := fun a b => by
         apply ConcreteCategory.hom_ext; intro x; rfl }
 
+/-- The atom object is nominal: each atom `a` is supported by `{a}`. -/
 lemma atomGSet_isNominal : IsNominal atomGSet :=
   fun a => ⟨{a}, fun _ hπ => hπ a (Finset.mem_singleton_self a)⟩
 

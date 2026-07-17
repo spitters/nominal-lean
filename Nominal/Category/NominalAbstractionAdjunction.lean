@@ -233,6 +233,7 @@ noncomputable def concretize (X : Nom) : (atomObj ⊗ₙ absObj X) ⟶ X :=
 noncomputable def freshFor (A : Nom) (x : A.obj.V) : Atom :=
   (Infinite.exists_notMem_finset (supp A.property x)).choose
 
+/-- `freshFor A x` is fresh for `x`: it lies outside the least support of `x`. -/
 lemma freshFor_spec (A : Nom) (x : A.obj.V) : freshFor A x ∉ supp A.property x :=
   (Infinite.exists_notMem_finset (supp A.property x)).choose_spec
 
@@ -288,7 +289,8 @@ lemma unitVal_equivariant {A : Nom} (π : PermAtom) (x : A.obj.V) :
     exact hfx (π.injective hceq ▸ hc)
   rw [unitVal_eq hπfresh]
   have hpair : (sepGSet atomGSet A.obj).act π ⟨(freshFor A x, x), sep_atom_of_fresh hfx⟩
-      = (⟨(π (freshFor A x), A.obj.act π x), sep_atom_of_fresh hπfresh⟩ : sepCarrier atomGSet A.obj) :=
+      = (⟨(π (freshFor A x), A.obj.act π x), sep_atom_of_fresh hπfresh⟩ :
+        sepCarrier atomGSet A.obj) :=
     Subtype.ext rfl
   rw [hpair]
 
