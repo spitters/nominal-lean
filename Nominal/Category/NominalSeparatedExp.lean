@@ -44,8 +44,7 @@ open scoped Classical
 namespace Nominal
 
 /-- Group-inverse cancellation as function application: `π (π⁻¹ x) = x`. -/
-private lemma perm_apply_inv (π : PermAtom) (x : Atom) : π (π⁻¹ x) = x := by
-  rw [← Equiv.Perm.mul_apply, mul_inv_cancel, Equiv.Perm.one_apply]
+private lemma perm_apply_inv (π : PermAtom) (x : Atom) : π (π⁻¹ x) = x := by simp
 
 /-! ### Freshness and avoidance -/
 
@@ -61,8 +60,7 @@ lemma exists_avoiding_perm (Fix Avoid : Finset Atom) :
   | empty => exact fun _ => ⟨1, fun _ _ => rfl, fun a ha => absurd ha (Finset.notMem_empty a)⟩
   | @insert a M ha IH =>
     intro hdisj
-    have haFix : a ∉ Fix :=
-      fun h => (Finset.disjoint_left.mp hdisj (Finset.mem_insert_self a M)) h
+    have haFix : a ∉ Fix := Finset.disjoint_left.mp hdisj (Finset.mem_insert_self a M)
     have hMFix : Disjoint M Fix := hdisj.mono_left (Finset.subset_insert a M)
     obtain ⟨σ, hσfix, hσM⟩ := IH hMFix
     have hσaFix : σ a ∉ Fix := by

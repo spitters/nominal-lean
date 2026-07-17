@@ -47,8 +47,6 @@ open CategoryTheory
 
 open scoped Classical
 
-set_option maxHeartbeats 1000000
-
 namespace Nominal
 
 variable {A B C : Nom}
