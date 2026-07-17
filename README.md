@@ -8,17 +8,10 @@ category of nominal sets, its symmetric-monoidal and monoidal-closed structure,
 the name-abstraction functor with its binding adjunction and recursion
 principle, and the equivalence with the finitely-supported `FinPerm`-sets.
 
-This layer depends only on Mathlib — no cryptography, no probability, no
-package algebra.
+It depends only on Mathlib — no cryptography, no probability, no package algebra.
 
-> **Upstream source.** This is the maintained home of the nominal-sets
-> development. The `CatCryptCore.Nominal.*` modules in *CatCrypt-core* and the
-> `CatCrypt.Category.Nominal*` modules in the *CatCrypt* development tree are
-> shims that re-export this library — edit the nominal theory **here**, not in
-> the shims. Module names live under the `Nominal.*` root (`import Nominal`,
-> `import Nominal.Category`), so the library coexists with any package that has
-> its own `CatCrypt.*` module tree. Declared *namespaces* are `CatCrypt.Nominal`
-> and `CatCrypt.Category`, so the shims re-export without renaming.
+Modules live under the `Nominal.*` root (`import Nominal`, `import Nominal.Category`);
+the declared namespaces are `CatCrypt.Nominal` and `CatCrypt.Category`.
 
 ## Contents
 
