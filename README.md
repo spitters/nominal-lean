@@ -1,5 +1,7 @@
 # Nominal
 
+📖 **[API documentation](https://spitters.github.io/nominal-lean/)** (doc-gen4)
+
 The Gabbay–Pitts theory of names and symmetry in Lean 4: a countable set of
 atoms, finite permutations, nominal sets (finitely-supported permutation
 actions), freshness and the `И` (new) quantifier, support, and name
