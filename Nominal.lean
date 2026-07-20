@@ -9,6 +9,8 @@ import Nominal.Nominal
 import Nominal.Fresh
 import Nominal.Support
 import Nominal.NameAbstraction
+import Nominal.Lambda
+import Nominal.LambdaAbs
 
 /-!
 # Nominal sets

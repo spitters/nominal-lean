@@ -16,6 +16,19 @@ lean_lib Nominal where
   -- so downstream `CatCryptCore` / `CatCrypt` shims re-export without churn.
   globs := #[.andSubmodules `Nominal]
 
--- mathlib only: this is an upstream leaf. No crypto / SSProve-package deps.
+-- Module root `NominalIris.*` (namespace `Nominal.Iris`). The Iris/BI reading of
+-- nominal separation: disjoint name-support as a model of bunched implications,
+-- its `DisjointLeibnizSet` camera, and the `iOwn` name-allocation view-shift.
+-- A separate library so the core `Nominal` target stays mathlib-only; only this
+-- target pulls in iris-lean.
+lean_lib NominalIris where
+  globs := #[.andSubmodules `NominalIris]
+
+-- mathlib: the core dependency.
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4" @ "v4.30.0"
+
+-- iris-lean (Lean 4 Iris port): BI + proof mode + cameras + the IProp base logic.
+-- Used only by the `NominalIris` target.
+require iris from git
+  "https://github.com/leanprover-community/iris-lean" @ "v4.30.0" / "Iris"
