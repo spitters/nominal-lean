@@ -88,7 +88,7 @@ lemma curry_sep_transport {A B C : Nom} (g : A ⊗ₙ B ⟶ C) (a : A.obj.V)
   have hc : g.hom.hom ((sepGSet A.obj B.obj).act π ⟨(a, b), hsep⟩)
       = C.obj.act π (g.hom.hom ⟨(a, b), hsep⟩) := by
     have := ConcreteCategory.congr_hom (g.hom.comm π) (⟨(a, b), hsep⟩ : sepCarrier A.obj B.obj)
-    simpa only [ConcreteCategory.comp_apply] using this
+    simpa only [ConcreteCategory.comp_apply] using! this
   rw [← hc]
   apply congrArg
   apply Subtype.ext
