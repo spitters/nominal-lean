@@ -198,7 +198,7 @@ def uncurryActionHom {A B C : Nom} (h : A ⟶ B ⊸ₙ C) :
     have hc : h.hom.hom (A.obj.act π p.1.1)
         = (funGSet B.obj C.obj).act π (h.hom.hom p.1.1) := by
       have := ConcreteCategory.congr_hom (h.hom.comm π) p.1.1
-      simpa only [ConcreteCategory.comp_apply] using this
+      simpa only [ConcreteCategory.comp_apply] using! this
     show (h.hom.hom (A.obj.act π p.1.1)).1 (B.obj.act π p.1.2)
       = C.obj.act π ((h.hom.hom p.1.1).1 p.1.2)
     rw [hc]
