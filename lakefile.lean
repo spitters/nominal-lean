@@ -33,9 +33,9 @@ lean_lib NominalIris where
 
 -- mathlib: the core dependency.
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4" @ "v4.30.0"
+  "https://github.com/leanprover-community/mathlib4" @ "v4.32.0"
 
 -- iris-lean (Lean 4 Iris port): BI + proof mode + cameras + the IProp base logic.
 -- Used only by the `NominalIris` target.
 require iris from git
-  "https://github.com/leanprover-community/iris-lean" @ "v4.30.0" / "Iris"
+  "https://github.com/leanprover-community/iris-lean" @ "v4.32.2" / "Iris"
