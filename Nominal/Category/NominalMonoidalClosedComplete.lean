@@ -252,7 +252,7 @@ noncomputable def curryQActionHom (g : A ⊗ₙ B ⟶ C) : A.obj ⟶ (B ⊸ₛ C
         = C.obj.act π (g.hom.hom ⟨(a, B.obj.act π⁻¹ b), hsepa⟩) := by
       have := ConcreteCategory.congr_hom (g.hom.comm π)
         (⟨(a, B.obj.act π⁻¹ b), hsepa⟩ : sepCarrier A.obj B.obj)
-      simpa only [ConcreteCategory.comp_apply] using this
+      simpa only [ConcreteCategory.comp_apply] using! this
     have hb : B.obj.act π (B.obj.act π⁻¹ b) = b := by
       rw [← GSet.act_mul, mul_inv_cancel, GSet.act_one]
     have hpair : (sepGSet A.obj B.obj).act π ⟨(a, B.obj.act π⁻¹ b), hsepa⟩
