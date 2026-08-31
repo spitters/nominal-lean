@@ -395,7 +395,7 @@ noncomputable def uncurryQActionHom {A B C : Nom} (h : A ⟶ B ⊸ₛ C) :
     -- `ρπ f` is a fresh representative for `(h (ρπ a), ρπ b)`
     have hcomm : h.hom.hom (A.obj.act π a) = (sepExpGSet B C).act π (h.hom.hom a) := by
       have := ConcreteCategory.congr_hom (h.hom.comm π) a
-      simpa only [ConcreteCategory.comp_apply] using this
+      simpa only [ConcreteCategory.comp_apply] using! this
     have hfX' : Quotient.mk (freshAgreeSetoid B C) ((funGSet B.obj C.obj).act π f)
         = h.hom.hom (A.obj.act π a) := by
       rw [hcomm, ← hfX, sepExpGSet_ρ_mk]
