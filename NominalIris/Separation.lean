@@ -3,9 +3,11 @@ Copyright (c) 2026 Bas Spitters. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: Bas Spitters
 -/
-import Iris.ProofMode
-import Iris.Instances.Classical.Instance
-import Nominal.Atom
+module
+
+public import Iris.ProofMode
+public import Iris.Instances.Classical.Instance
+public import Nominal.Atom
 
 set_option autoImplicit false
 
@@ -21,6 +23,8 @@ Permutation and equivariance for the nominal objects — name-worlds
 (`Finset Atom`) and terms — use nominal-lean's `NomSet` / `FinPerm` action.
 `NomProp` is not itself a nominal set: not every proposition has finite support.
 -/
+
+@[expose] public section
 
 namespace NominalIris
 

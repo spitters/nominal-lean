@@ -3,14 +3,16 @@ Copyright (c) 2024 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Atom
-import Nominal.FinPerm
-import Nominal.Nominal
-import Nominal.Fresh
-import Nominal.Support
-import Nominal.NameAbstraction
-import Nominal.Lambda
-import Nominal.LambdaAbs
+module
+
+public import Nominal.Atom
+public import Nominal.FinPerm
+public import Nominal.Nominal
+public import Nominal.Fresh
+public import Nominal.Support
+public import Nominal.NameAbstraction
+public import Nominal.Lambda
+public import Nominal.LambdaAbs
 
 /-!
 # Nominal sets

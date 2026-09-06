@@ -3,8 +3,10 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.NominalCoreEquivalence
-import Nominal.Category.NominalMonoidal
+module
+
+public import Nominal.Category.NominalCoreEquivalence
+public import Nominal.Category.NominalMonoidal
 
 set_option autoImplicit false
 
@@ -36,6 +38,8 @@ canonical least support `suppFin` with its equivariance, packages the extension 
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 
@@ -129,7 +133,7 @@ lemma supportsFin_erase {X : GSetFin} {s t : Finset CatCrypt.Nominal.Atom} {x : 
     rw [hStepA, hswap]
 
 /-- Auxiliary for `supportsFin_inter`: strong induction on `(s \ t).card`. -/
-private lemma supportsFin_inter_aux {X : GSetFin} {t : Finset CatCrypt.Nominal.Atom} {x : X.V}
+lemma supportsFin_inter_aux {X : GSetFin} {t : Finset CatCrypt.Nominal.Atom} {x : X.V}
     (ht : SupportsFin X t x) :
     ∀ (n : ℕ) (s : Finset CatCrypt.Nominal.Atom), (s \ t).card = n →
       SupportsFin X s x → SupportsFin X (s ∩ t) x := by

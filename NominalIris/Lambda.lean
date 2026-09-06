@@ -3,8 +3,10 @@ Copyright (c) 2026 Bas Spitters. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: Bas Spitters
 -/
-import NominalIris.Camera
-import Nominal.Lambda
+module
+
+public import NominalIris.Camera
+public import Nominal.Lambda
 
 set_option autoImplicit false
 
@@ -22,6 +24,8 @@ allocated fresh name binds a genuine α-correct nominal abstraction `Tm.lam`.
 * `alloc_and_bind` — allocate a fresh binder and form a well-scoped nominal
   abstraction, under the basic update.
 -/
+
+@[expose] public section
 
 namespace NominalIris
 

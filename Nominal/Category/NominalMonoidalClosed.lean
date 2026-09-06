@@ -3,8 +3,10 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.NominalMonoidal
-import Mathlib.CategoryTheory.Monoidal.Closed.Basic
+module
+
+public import Nominal.Category.NominalMonoidal
+public import Mathlib.CategoryTheory.Monoidal.Closed.Basic
 
 set_option autoImplicit false
 
@@ -39,6 +41,8 @@ prerequisite; it is documented, not registered as a vacuous instance.
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 

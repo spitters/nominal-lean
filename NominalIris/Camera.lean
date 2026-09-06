@@ -3,10 +3,12 @@ Copyright (c) 2026 Bas Spitters. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: Bas Spitters
 -/
-import Iris.Algebra.LeibnizSet
-import Iris.Algebra.Auth
-import Iris.Instances.IProp
-import Nominal.Atom
+module
+
+public import Iris.Algebra.LeibnizSet
+public import Iris.Algebra.Auth
+public import Iris.Instances.IProp
+public import Nominal.Atom
 
 set_option autoImplicit false
 
@@ -24,6 +26,8 @@ allocator (the `den` bridge to the concrete BI lives in `NominalIris.Den`).
 * `ownAuth` / `ownFresh` — `iOwn` ghost ownership; `own_name_alloc`,
   `own_name_alloc_init`, `ownFresh_distinct`; `HasNameAlloc` + points-to notation.
 -/
+
+@[expose] public section
 
 namespace NominalIris
 

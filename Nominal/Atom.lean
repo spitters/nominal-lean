@@ -3,11 +3,13 @@ Copyright (c) 2024 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Finset.Empty
-import Mathlib.Data.Finset.Lattice.Fold
-import Mathlib.Order.BoundedOrder.Basic
-import Mathlib.Data.Countable.Defs
+module
+
+public import Mathlib.Data.Finset.Basic
+public import Mathlib.Data.Finset.Empty
+public import Mathlib.Data.Finset.Lattice.Fold
+public import Mathlib.Order.BoundedOrder.Basic
+public import Mathlib.Data.Countable.Defs
 
 /-!
 # Atoms for Nominal Sets
@@ -29,6 +31,8 @@ supply of distinguishable names.
   `Nominal/` layer this development ports.
 * [SSProve Nominal Package](https://github.com/SSProve/ssprove)
 -/
+
+@[expose] public section
 
 namespace CatCrypt.Nominal
 

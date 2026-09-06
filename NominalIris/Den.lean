@@ -3,8 +3,10 @@ Copyright (c) 2026 Bas Spitters. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: Bas Spitters
 -/
-import NominalIris.Camera
-import NominalIris.Separation
+module
+
+public import NominalIris.Camera
+public import NominalIris.Separation
 
 set_option autoImplicit false
 
@@ -17,6 +19,8 @@ the camera into the concrete BI, so the concrete headline `freshName_sep_ne` is
 the image of camera validity. This is the `ℕ`-version equivalence, rebased onto
 `Atom` so the whole stack shares one framework.
 -/
+
+@[expose] public section
 
 namespace NominalIris
 
@@ -43,11 +47,11 @@ theorem den_unit : den (UCMRA.unit : NameRA) = (emp : NomProp) := by
   show den (.valid ∅) = _
   rw [den_valid, NameSet.toFinset_empty, worldProp_empty]
 
-private theorem nomFalse_sep (Q : NomProp) : (iprop(nomFalse ∗ Q) : NomProp) = nomFalse := by
+theorem nomFalse_sep (Q : NomProp) : (iprop(nomFalse ∗ Q) : NomProp) = nomFalse := by
   funext σ; apply propext
   exact ⟨fun ⟨_, _, _, _, h, _⟩ => h.elim, fun h => h.elim⟩
 
-private theorem sep_nomFalse (P : NomProp) : (iprop(P ∗ nomFalse) : NomProp) = nomFalse := by
+theorem sep_nomFalse (P : NomProp) : (iprop(P ∗ nomFalse) : NomProp) = nomFalse := by
   funext σ; apply propext
   exact ⟨fun ⟨_, _, _, _, _, h⟩ => h.elim, fun h => h.elim⟩
 

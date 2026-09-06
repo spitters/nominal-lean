@@ -3,7 +3,9 @@ Copyright (c) 2024 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.FinPerm
+module
+
+public import Nominal.FinPerm
 
 /-!
 # Nominal Sets
@@ -27,6 +29,8 @@ orbit/stabilizer theory, etc.
   `Nominal/` layer this development ports.
 * SSProve `theories/Crypt/nominal/Nominal.v`
 -/
+
+@[expose] public section
 
 namespace CatCrypt.Nominal
 

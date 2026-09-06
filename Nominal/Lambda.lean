@@ -3,8 +3,10 @@ Copyright (c) 2026 Bas Spitters. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: Bas Spitters
 -/
-import Nominal.NameAbstraction
-import Nominal.Fresh
+module
+
+public import Nominal.NameAbstraction
+public import Nominal.Fresh
 
 set_option autoImplicit false
 
@@ -35,6 +37,8 @@ equal (`Tm.lam_rename`) — an equality of terms, not a separate α-relation.
 
 * A. M. Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, CUP 2013.
 -/
+
+@[expose] public section
 
 namespace CatCrypt.Nominal.Lambda
 

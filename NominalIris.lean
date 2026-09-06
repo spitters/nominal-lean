@@ -3,10 +3,12 @@ Copyright (c) 2026 Bas Spitters. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: Bas Spitters
 -/
-import NominalIris.Separation
-import NominalIris.Camera
-import NominalIris.Den
-import NominalIris.Lambda
+module
+
+public import NominalIris.Separation
+public import NominalIris.Camera
+public import NominalIris.Den
+public import NominalIris.Lambda
 
 /-!
 # `NominalIris` — nominal separation and binding in Iris

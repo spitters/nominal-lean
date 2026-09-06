@@ -3,7 +3,9 @@ Copyright (c) 2024 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Nominal
+module
+
+public import Nominal.Nominal
 
 /-!
 # Fresh Atoms and the Move Operation
@@ -22,6 +24,8 @@ nominal CatCrypt's state separation.
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013, Chapter 3.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598 — the SSProve `Nominal/` layer this development ports.
 -/
+
+@[expose] public section
 
 namespace CatCrypt.Nominal
 
@@ -310,7 +314,7 @@ noncomputable def movePerm {α β : Type*} [NomSet α] [NomSet β] (x : α) (y :
   freshMove x y
 
 /-- The fresh-atom offset is monotone in the finset: a larger set fixes a larger offset. -/
-private theorem offset_mono {s t : Finset Atom} (hst : s ⊆ t) :
+theorem offset_mono {s t : Finset Atom} (hst : s ⊆ t) :
     Atom.offset s ≤ Atom.offset t := by
   rcases s.eq_empty_or_nonempty with he | hs
   · simp [Atom.offset, he]

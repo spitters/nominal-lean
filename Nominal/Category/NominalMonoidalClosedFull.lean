@@ -3,7 +3,9 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.NominalMonoidalClosed
+module
+
+public import Nominal.Category.NominalMonoidalClosed
 
 set_option autoImplicit false
 
@@ -46,6 +48,8 @@ non-injective map, so it is impossible — not merely unproved.  The precise res
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 
@@ -109,17 +113,17 @@ private lemma perm_apply_inv (π : PermAtom) (x : Atom) : π (π⁻¹ x) = x := 
   rw [← Equiv.Perm.mul_apply, mul_inv_cancel, Equiv.Perm.one_apply]
 
 /-- Group-inverse cancellation as function application: `π⁻¹ (π x) = x`. -/
-private lemma perm_inv_apply (π : PermAtom) (x : Atom) : π⁻¹ (π x) = x := by
+lemma perm_inv_apply (π : PermAtom) (x : Atom) : π⁻¹ (π x) = x := by
   rw [← Equiv.Perm.mul_apply, inv_mul_cancel, Equiv.Perm.one_apply]
 
 /-- Two atoms with a group-inverse: `π⁻¹ x = a ↔ x = π a`. -/
-private lemma perm_inv_eq_iff (π : PermAtom) (x a : Atom) : (π⁻¹ x = a) ↔ (x = π a) := by
+lemma perm_inv_eq_iff (π : PermAtom) (x a : Atom) : (π⁻¹ x = a) ↔ (x = π a) := by
   constructor
   · intro h; rw [← h, perm_apply_inv]
   · intro h; rw [h, perm_inv_apply]
 
 /-- A finite set supporting an atom (in `atomGSet`) must contain it. -/
-private lemma atom_supports_mem {s : Finset Atom} {a : Atom} (h : Supports atomGSet s a) :
+lemma atom_supports_mem {s : Finset Atom} {a : Atom} (h : Supports atomGSet s a) :
     a ∈ s := by
   by_contra ha
   obtain ⟨c, hc⟩ := Infinite.exists_notMem_finset (insert a s)
@@ -134,11 +138,11 @@ private lemma atom_supports_mem {s : Finset Atom} {a : Atom} (h : Supports atomG
   exact hca hfix
 
 /-- Two `decide`s of equivalent propositions are equal (instance-agnostic). -/
-private lemma decide_eq_of_iff {p q : Prop} [Decidable p] [Decidable q] (h : p ↔ q) :
+lemma decide_eq_of_iff {p q : Prop} [Decidable p] [Decidable q] (h : p ↔ q) :
     decide p = decide q := decide_eq_decide.mpr h
 
 /-- Separated atoms are distinct. -/
-private lemma atom_separated_ne {a b : Atom} (h : Separated atomGSet atomGSet a b) : a ≠ b := by
+lemma atom_separated_ne {a b : Atom} (h : Separated atomGSet atomGSet a b) : a ≠ b := by
   obtain ⟨s, t, hs, ht, hd⟩ := h
   intro hab
   subst hab

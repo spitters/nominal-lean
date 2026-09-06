@@ -3,9 +3,11 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.Nominal
-import Mathlib.GroupTheory.Perm.Basic
-import Mathlib.Logic.Equiv.Basic
+module
+
+public import Nominal.Category.Nominal
+public import Mathlib.GroupTheory.Perm.Basic
+public import Mathlib.Logic.Equiv.Basic
 
 set_option autoImplicit false
 
@@ -59,6 +61,8 @@ and `absPt_rename`) needs no canonical support and is delivered in full.
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 

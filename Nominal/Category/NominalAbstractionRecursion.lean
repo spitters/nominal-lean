@@ -3,9 +3,11 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.NominalCoreEquivalence
-import Nominal.Category.NominalAbstraction
-import Nominal.NameAbstraction
+module
+
+public import Nominal.Category.NominalCoreEquivalence
+public import Nominal.Category.NominalAbstraction
+public import Nominal.NameAbstraction
 
 set_option autoImplicit false
 
@@ -67,6 +69,8 @@ Everything below is axiom-clean (`propext`, `Classical.choice`, `Quot.sound`).
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 

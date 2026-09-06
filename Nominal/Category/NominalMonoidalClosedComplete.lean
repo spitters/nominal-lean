@@ -3,7 +3,9 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.NominalSeparatedExp
+module
+
+public import Nominal.Category.NominalSeparatedExp
 
 set_option autoImplicit false
 
@@ -42,6 +44,8 @@ sides collapse to `g`-values and agree by `curry_sep_transport`.
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 

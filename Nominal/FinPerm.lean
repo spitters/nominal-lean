@@ -3,8 +3,10 @@ Copyright (c) 2024 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Atom
-import Mathlib.GroupTheory.Perm.Basic
+module
+
+public import Nominal.Atom
+public import Mathlib.GroupTheory.Perm.Basic
 
 /-!
 # Finite Permutations
@@ -35,6 +37,8 @@ permutations, even though the set of atoms is infinite.
   `Nominal/` layer this development ports.
 * SSProve `theories/Crypt/nominal/Nominal.v`
 -/
+
+@[expose] public section
 
 namespace CatCrypt.Nominal
 

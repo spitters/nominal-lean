@@ -3,10 +3,12 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.Nominal
-import Nominal.Category.NominalMonoidal
-import Nominal.Category.NominalAbstraction
-import Nominal.Category.NominalSeparatedExp
+module
+
+public import Nominal.Category.Nominal
+public import Nominal.Category.NominalMonoidal
+public import Nominal.Category.NominalAbstraction
+public import Nominal.Category.NominalSeparatedExp
 
 set_option autoImplicit false
 
@@ -47,6 +49,8 @@ All results are axiom-clean (`propext`, `Classical.choice`, `Quot.sound`).
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 
@@ -233,7 +237,7 @@ theorem absToExp_mono (X : Nom) : Mono (absToExp X) := by
   apply Action.Hom.ext
   apply ConcreteCategory.hom_ext; intro z
   apply absToExpFn_injective X
-  simpa only [ConcreteCategory.comp_apply] using
+  simpa only [ConcreteCategory.comp_apply] using!
     congrArg (fun m : Z ⟶ atomObj ⊸ₛ X => ConcreteCategory.hom m.hom.hom z) hgh
 
 end Nominal

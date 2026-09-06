@@ -3,20 +3,22 @@ Copyright (c) 2024 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.Nominal
-import Nominal.Category.NominalMonoidal
-import Nominal.Category.NominalMonoidalClosed
-import Nominal.Category.NominalMonoidalClosedFull
-import Nominal.Category.NominalMonoidalClosedComplete
-import Nominal.Category.NominalSeparatedExp
-import Nominal.Category.NominalAbstraction
-import Nominal.Category.NominalCoreBridge
-import Nominal.Category.NominalCoreEquivalence
-import Nominal.Category.NominalCoreEquivalenceComplete
-import Nominal.Category.NominalAbstractionClosed
-import Nominal.Category.NominalAbstractionAdjunction
-import Nominal.Category.NominalAbstractionNatIso
-import Nominal.Category.NominalAbstractionRecursion
+module
+
+public import Nominal.Category.Nominal
+public import Nominal.Category.NominalMonoidal
+public import Nominal.Category.NominalMonoidalClosed
+public import Nominal.Category.NominalMonoidalClosedFull
+public import Nominal.Category.NominalMonoidalClosedComplete
+public import Nominal.Category.NominalSeparatedExp
+public import Nominal.Category.NominalAbstraction
+public import Nominal.Category.NominalCoreBridge
+public import Nominal.Category.NominalCoreEquivalence
+public import Nominal.Category.NominalCoreEquivalenceComplete
+public import Nominal.Category.NominalAbstractionClosed
+public import Nominal.Category.NominalAbstractionAdjunction
+public import Nominal.Category.NominalAbstractionNatIso
+public import Nominal.Category.NominalAbstractionRecursion
 
 /-!
 # The category of nominal sets

@@ -3,8 +3,10 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal
-import Nominal.Category.Nominal
+module
+
+public import Nominal
+public import Nominal.Category.Nominal
 
 set_option autoImplicit false
 
@@ -78,6 +80,8 @@ These are stated as a precise residual rather than asserted; no theorem below cl
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 

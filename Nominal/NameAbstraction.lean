@@ -3,7 +3,9 @@ Copyright (c) 2025 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Fresh
+module
+
+public import Nominal.Fresh
 
 /-!
 # Name Abstraction
@@ -32,6 +34,8 @@ the nominal analogue of alpha-equivalence for binders.
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013, Chapter 4.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598 — the SSProve `Nominal/` layer this development ports.
 -/
+
+@[expose] public section
 
 namespace CatCrypt.Nominal
 
@@ -282,11 +286,11 @@ theorem smul_abs {α : Type*} [NomSet α] (π : FinPerm) (a : Atom) (x : α) :
 /-! ### The nominal-set instance -/
 
 /-- Support of a name abstraction representative: `supp x \ {a}`. -/
-private noncomputable def absSupp {α : Type*} [NomSet α] (p : Atom × α) : Finset Atom :=
+noncomputable def absSupp {α : Type*} [NomSet α] (p : Atom × α) : Finset Atom :=
   NomSet.supp p.2 \ {p.1}
 
 /-- AbsRel-related pairs have the same support. -/
-private theorem absSupp_eq_of_absRel {α : Type*} [NomSet α] {p q : Atom × α}
+theorem absSupp_eq_of_absRel {α : Type*} [NomSet α] {p q : Atom × α}
     (h : AbsRel p q) : absSupp p = absSupp q := by
   obtain ⟨c, hfresh, heq⟩ := h
   have hf := AbsRel.fresh_pair c p q hfresh
@@ -322,6 +326,7 @@ private theorem absSupp_eq_of_absRel {α : Type*} [NomSet α] {p q : Atom × α}
       · rw [FinPerm.swap_apply_of_ne_of_ne hbp hbc] at hb_eq
         exact ⟨hb_eq ▸ hb_in, fun h => hbp (hb_eq ▸ h)⟩
 
+set_option backward.privateInPublic true in
 /-- NomSet instance for NameAbs. -/
 noncomputable instance instNomSetNameAbs {α : Type*} [NomSet α] :
     NomSet (NameAbs α) where
@@ -403,7 +408,7 @@ theorem absRel_any_fresh {α : Type*} [NomSet α] {p q : Atom × α}
 
 /-- Well-definedness of concretion: if AbsRel p q and `a` is fresh for the abstraction
     class (i.e. `a ∉ absSupp p`), then `swap a p.1 • p.2 = swap a q.1 • q.2`. -/
-private theorem concretize_wd {α : Type*} [NomSet α] (a : Atom) {p q : Atom × α}
+theorem concretize_wd {α : Type*} [NomSet α] (a : Atom) {p q : Atom × α}
     (hpq : AbsRel p q) (ha : a ∉ absSupp p) :
     FinPerm.swap a p.1 • p.2 = FinPerm.swap a q.1 • q.2 := by
   obtain ⟨a₁, x₁⟩ := p
@@ -461,6 +466,7 @@ noncomputable def concretize {α : Type*} [NomSet α] (a : Atom)
     (nabs : NameAbs α) : α :=
   FinPerm.swap a nabs.out.1 • nabs.out.2
 
+set_option backward.privateInPublic true in
 /-- Concretize applied to an abstraction. -/
 theorem concretize_abs {α : Type*} [NomSet α] (a b : Atom) (x : α)
     (ha : Fresh a (abs b x)) : concretize a (abs b x) = FinPerm.swap a b • x := by

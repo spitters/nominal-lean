@@ -3,7 +3,9 @@ Copyright (c) 2026 Bas Spitters. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: Bas Spitters
 -/
-import Nominal.Lambda
+module
+
+public import Nominal.Lambda
 
 set_option autoImplicit false
 
@@ -21,6 +23,8 @@ The fv-based α-rename `Tm.lam_rename_fresh` and the some=any principle
 * `tmLam` and `Tm.lam_eq_tmLam` — the binder factors through `NameAbs Tm`.
 * `Tm.lam_some_any` — the Gabbay–Pitts some=any principle for the binder.
 -/
+
+@[expose] public section
 
 namespace CatCrypt.Nominal.Lambda
 

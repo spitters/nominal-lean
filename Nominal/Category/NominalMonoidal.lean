@@ -3,10 +3,12 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.Nominal
-import Mathlib.Data.Finset.Lattice.Fold
-import Mathlib.Data.Finset.Powerset
-import Mathlib.CategoryTheory.Monoidal.Braided.Basic
+module
+
+public import Nominal.Category.Nominal
+public import Mathlib.Data.Finset.Lattice.Fold
+public import Mathlib.Data.Finset.Powerset
+public import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 
 set_option autoImplicit false
 
@@ -36,6 +38,8 @@ giving the associator `(A ⊗ₙ B) ⊗ₙ C ≅ A ⊗ₙ (B ⊗ₙ C)` and henc
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 
@@ -116,7 +120,7 @@ lemma supports_erase {A : GSet} {s t : Finset Atom} {x : A.V}
     rw [hStepA, hswap]
 
 /-- Auxiliary for `supports_inter`: strong induction on `(s \ t).card`. -/
-private lemma supports_inter_aux {A : GSet} {t : Finset Atom} {x : A.V}
+lemma supports_inter_aux {A : GSet} {t : Finset Atom} {x : A.V}
     (ht : Supports A t x) :
     ∀ (n : ℕ) (s : Finset Atom), (s \ t).card = n → Supports A s x → Supports A (s ∩ t) x := by
   intro n

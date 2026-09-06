@@ -3,10 +3,12 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.Nominal
-import Nominal.Category.NominalAbstraction
-import Nominal.Category.NominalMonoidal
-import Mathlib.CategoryTheory.Adjunction.Basic
+module
+
+public import Nominal.Category.Nominal
+public import Nominal.Category.NominalAbstraction
+public import Nominal.Category.NominalMonoidal
+public import Mathlib.CategoryTheory.Adjunction.Basic
 
 set_option autoImplicit false
 
@@ -60,6 +62,8 @@ Everything here is axiom-clean (`propext`, `Classical.choice`, `Quot.sound` only
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 
@@ -367,7 +371,7 @@ lemma homEquiv_left_inv_apply (A B : Nom) (f : (atomObj ⊗ₙ A) ⟶ B)
         ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩)
       = B.obj.act (Equiv.swap a (freshFor A x))
         (f.hom.hom ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩) := by
-    simpa only [ConcreteCategory.comp_apply] using
+    simpa only [ConcreteCategory.comp_apply] using!
       ConcreteCategory.congr_hom (f.hom.comm (Equiv.swap a (freshFor A x)))
         ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩
   rw [← hcomm]

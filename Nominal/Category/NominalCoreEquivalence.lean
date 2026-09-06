@@ -3,12 +3,14 @@ Copyright (c) 2026 CatCrypt Contributors. All rights reserved.
 Released under MIT license as described in the file LICENSE.
 Authors: CatCrypt Contributors
 -/
-import Nominal.Category.NominalCoreBridge
-import Nominal.Category.Nominal
-import Nominal
-import Mathlib.CategoryTheory.Action.Basic
-import Mathlib.CategoryTheory.Functor.FullyFaithful
-import Mathlib.CategoryTheory.Equivalence
+module
+
+public import Nominal.Category.NominalCoreBridge
+public import Nominal.Category.Nominal
+public import Nominal
+public import Mathlib.CategoryTheory.Action.Basic
+public import Mathlib.CategoryTheory.Functor.FullyFaithful
+public import Mathlib.CategoryTheory.Equivalence
 
 set_option autoImplicit false
 
@@ -65,6 +67,8 @@ equivalence.
 * Pitts, *Nominal Sets: Names and Symmetry in Computer Science*, Cambridge University Press, 2013.
 * Larsen and Schürmann, *Nominal State-Separating Proofs*, IACR ePrint 2025/598.
 -/
+
+@[expose] public section
 
 open CategoryTheory
 
@@ -196,7 +200,7 @@ noncomputable def fullPreimage {X Y : Nom} (g : res.obj X ⟶ res.obj Y) :
           act_eq_of_supports hsy (fun a ha => hτ a (Finset.mem_union_right sx ha))
         have hcomm : g.hom.hom (X.obj.act (finPermToPerm τ) x)
             = Y.obj.act (finPermToPerm τ) (g.hom.hom x) := by
-          simpa only [ConcreteCategory.comp_apply] using ConcreteCategory.congr_hom (g.hom.comm τ) x
+          simpa only [ConcreteCategory.comp_apply] using! ConcreteCategory.congr_hom (g.hom.comm τ) x
         rw [hax, hcomm, hay] }
 
 instance instFaithfulRes : res.Faithful where
