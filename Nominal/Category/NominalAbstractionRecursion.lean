@@ -54,7 +54,7 @@ full permutation group. `swap_transport` reconciles them: the reconstructed full
 `coreToNom β` on `Equiv.swap (coreAtomEquiv a) (coreAtomEquiv c)` is exactly the core
 `FinPerm.swap a c` action. Its proof factors through `fromPermℕ_swap` (the transposition transports
 along the atom equivalence) and `fullSmul_val` (the reconstructed action agrees with the native
-`FinPerm`-action on a genuine `FinPerm`).
+`FinPerm`-action on the underlying permutation of a `FinPerm`).
 
 ## The abstraction machinery
 
@@ -148,8 +148,8 @@ variable {β : Type} [NomSet β]
 
 /-! ### `FinPerm`-vs-`Perm` compatibility -/
 
-/-- The reconstructed full-`Perm` action of `coreToNom β` on a genuine `FinPerm` (given as its
-underlying permutation) agrees with the native core `FinPerm`-action. -/
+/-- The reconstructed full-`Perm` action of `coreToNom β` on the underlying permutation of a
+`FinPerm` agrees with the native core `FinPerm`-action. -/
 lemma fullSmul_val (τ : FinPerm) (x : β) : fullSmul τ.val x = τ • x := by
   show extendPerm τ.val (NomSet.supp x) • x = τ • x
   apply act_eq_of_agree_on_supp
@@ -281,7 +281,6 @@ lemma coreAbs_finPerm (τ : FinPerm) (w : NameAbs β) :
     show absPt (coreToNom β).obj (coreAtomEquiv (τ • a)) (τ • x)
         = (absGSet (coreToNom β).obj).act (finPermToPerm τ)
             (absPt (coreToNom β).obj (coreAtomEquiv a) x)
-    rw [absGSet_ρ_mk]
     have h1 : coreAtomEquiv (τ • a) = finPermToPerm τ (coreAtomEquiv a) := by
       have hsa : (τ • a) = τ.val a := rfl
       rw [hsa]
@@ -289,7 +288,7 @@ lemma coreAbs_finPerm (τ : FinPerm) (w : NameAbs β) :
         Equiv.symm_apply_apply]
     have h2 : (τ • x : β) = (coreToNom β).obj.act (finPermToPerm τ) x :=
       (coreToNom_finPerm_act τ x).symm
-    rw [h1, h2]
+    exact congrArg₂ (absPt (coreToNom β).obj) h1 h2
 
 /-- **Equivariance** of the forward map against the reconstructed full-`Perm` actions on both
 sides. Reduces the full permutation to a `FinPerm` agreeing on the relevant supports, then applies

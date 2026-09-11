@@ -179,7 +179,7 @@ lemma freshAgree_symm {B C : Nom} {f g : funCarrier B.obj C.obj}
   rw [Finset.union_comm] at hb
   exact (h b hb).symm
 
-/-- **Transitivity** of fresh agreement — the load-bearing step.  Given `b` fresh for `supp f` and
+/-- **Transitivity** of fresh agreement.  Given `b` fresh for `supp f` and
 `supp g`, `exists_avoiding_perm` produces a support-fixing renaming `π` (fixing `supp f ∪ supp h`)
 that carries `b` off `supp g` as well; there `f ≈ g` and `g ≈ h` chain, and the values transport
 back by the conjugation equivariance `funGSetFull_apply_of_supports`. -/
@@ -267,14 +267,14 @@ def sepExpGSet (B C : Nom) : GSet where
         induction X using Quotient.inductionOn with
         | _ f =>
           show Quotient.mk _ ((funGSet B.obj C.obj).act 1 f) = Quotient.mk _ f
-          rw [GSet.act_one]; rfl
+          exact congrArg (Quotient.mk (freshAgreeSetoid B C)) (GSet.act_one ..)
       map_mul' := fun a b => by
         apply ConcreteCategory.hom_ext; intro X
         induction X using Quotient.inductionOn with
         | _ f =>
           show Quotient.mk _ ((funGSet B.obj C.obj).act (a * b) f)
             = Quotient.mk _ ((funGSet B.obj C.obj).act a ((funGSet B.obj C.obj).act b f))
-          rw [GSet.act_mul] }
+          exact congrArg (Quotient.mk (freshAgreeSetoid B C)) (GSet.act_mul ..) }
 
 @[simp] lemma sepExpGSet_ρ_mk (B C : Nom) (π : PermAtom) (f : funCarrier B.obj C.obj) :
     (sepExpGSet B C).act π (Quotient.mk (freshAgreeSetoid B C) f)
@@ -412,8 +412,8 @@ noncomputable def uncurryQActionHom {A B C : Nom} (h : A ⟶ B ⊸ₛ C) :
       rw [funGSet_ρ_coe, funGSetFull_ρ, ← GSet.act_mul, inv_mul_cancel, GSet.act_one]
     show evalCls B C (h.hom.hom (A.obj.act π a)) (B.obj.act π b) _
         = C.obj.act π (evalCls B C (h.hom.hom a) b _)
-    rw [evalCls_eq B C _ (B.obj.act π b) _ ((funGSet B.obj C.obj).act π f) hfX' hfb',
-        evalCls_eq B C _ b _ f hfX hfb, hshift]
+    exact (evalCls_eq B C _ (B.obj.act π b) _ ((funGSet B.obj C.obj).act π f) hfX' hfb').trans
+      (hshift.trans (congrArg (C.obj.act π) (evalCls_eq B C _ b _ f hfX hfb).symm))
 
 /-- **Quotient uncurrying**: transpose `A ⟶ (B ⊸ₛ C)` to `A ⊗ₙ B ⟶ C`.  This is the map that
 `uncurry_not_injective` says cannot be inverted on `funObj`; on the quotient it is well defined. -/
@@ -492,8 +492,8 @@ lemma uncurry_respects_freshAgree {A B C : Nom} (h h' : A ⟶ B ⊸ₙ C)
   apply ObjectProperty.hom_ext
   apply Action.Hom.ext
   apply ConcreteCategory.hom_ext; intro p
-  simp only [uncurry_apply]
   obtain ⟨⟨a, b⟩, hsep⟩ := p
+  show (h.hom.hom a).1 b = (h'.hom.hom a).1 b
   refine hpt a b ?_
   have hab : Disjoint (supp A.property a) (supp B.property b) :=
     (Separated_iff_disjoint A.property B.property a b).mp hsep
@@ -509,10 +509,10 @@ What is established here, axiom-cleanly (`propext`, `Classical.choice`, `Quot.so
 
 * the separated exponential **object** `B ⊸ₛ C` as the fresh-agreement quotient of `funGSet B C`,
   with its conjugation action and finite-support proof (`sepExpObj`, `sepExpGSet_isNominal`);
-* the fresh-agreement relation is a genuine **action-stable equivalence** (`freshAgreeSetoid`,
+* the fresh-agreement relation is an **action-stable equivalence** (`freshAgreeSetoid`,
   `freshAgree_trans`, `freshAgree_congr`), transitivity resting on the fresh-renaming
   `exists_avoiding_perm`;
-* the transpose **`uncurryQ : (A ⟶ B ⊸ₛ C) → (A ⊗ₙ B ⟶ C)`** (a genuine equivariant morphism), and
+* the transpose **`uncurryQ : (A ⟶ B ⊸ₛ C) → (A ⊗ₙ B ⟶ C)`** (an equivariant morphism), and
 * **`uncurryQ_injective`** — the exact resolution of `uncurry_not_injective`: on the quotient the
   transpose has no collision, together with `uncurry_respects_freshAgree` showing the collisions on
   `funObj` are *precisely* fresh agreement.

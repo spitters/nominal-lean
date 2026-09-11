@@ -27,7 +27,7 @@ genuine group action and that the finite-support subtype is nominal, and package
 ## STEP 2 — evaluation and (un)currying
 
 `evalHom : funObj B C ⊗ₙ B ⟶ C` is the evaluation morphism (the counit component), and
-`uncurry : (A ⟶ funObj B C) → (A ⊗ₙ B ⟶ C)` transposes a morphism.  Both are genuine equivariant
+`uncurry : (A ⟶ funObj B C) → (A ⊗ₙ B ⟶ C)` transposes a morphism.  Both are equivariant
 morphisms of nominal sets, fully proved.
 
 ## STEP 3 — the adjunction / `MonoidalClosed Nom`
@@ -87,13 +87,13 @@ def funGSet (A B : GSet) : GSet where
         apply ConcreteCategory.hom_ext; intro f
         apply Subtype.ext
         show (funGSetFull A B).act 1 f.1 = f.1
-        rw [GSet.act_one]
+        exact GSet.act_one ..
       map_mul' := fun a b => by
         apply ConcreteCategory.hom_ext; intro f
         apply Subtype.ext
         show (funGSetFull A B).act (a * b) f.1
           = (funGSetFull A B).act a ((funGSetFull A B).act b f.1)
-        rw [GSet.act_mul] }
+        exact GSet.act_mul .. }
 
 @[simp] lemma funGSet_ρ_coe (A B : GSet) (π : PermAtom) (f : funCarrier A B) :
     ((funGSet A B).act π f).1 = (funGSetFull A B).act π f.1 := rfl
@@ -184,8 +184,9 @@ def evalActionHom (B C : Nom) :
     apply ConcreteCategory.hom_ext; intro p
     show ((funGSet B.obj C.obj).act π p.1.1).1 (B.obj.act π p.1.2)
       = C.obj.act π (p.1.1.1 p.1.2)
-    simp only [funGSet_ρ_coe, funGSetFull_ρ]
-    rw [← GSet.act_mul, inv_mul_cancel, GSet.act_one]
+    have hx : B.obj.act π⁻¹ (B.obj.act π p.1.2) = p.1.2 := by
+      rw [← GSet.act_mul, inv_mul_cancel, GSet.act_one]
+    exact congrArg (C.obj.act π) (congrArg p.1.1.1 hx)
 
 /-- The **evaluation** morphism `(B ⊸ₙ C) ⊗ₙ B ⟶ C` (the counit component of the intended
 adjunction): evaluate a finitely supported function at a separated argument. -/
@@ -206,11 +207,12 @@ def uncurryActionHom {A B C : Nom} (h : A ⟶ B ⊸ₙ C) :
     show (h.hom.hom (A.obj.act π p.1.1)).1 (B.obj.act π p.1.2)
       = C.obj.act π ((h.hom.hom p.1.1).1 p.1.2)
     rw [hc]
-    simp only [funGSet_ρ_coe, funGSetFull_ρ]
-    rw [← GSet.act_mul, inv_mul_cancel, GSet.act_one]
+    have hx : B.obj.act π⁻¹ (B.obj.act π p.1.2) = p.1.2 := by
+      rw [← GSet.act_mul, inv_mul_cancel, GSet.act_one]
+    exact congrArg (C.obj.act π) (congrArg (h.hom.hom p.1.1).1 hx)
 
-/-- **Uncurrying**: transpose a morphism `A ⟶ (B ⊸ₙ C)` to a morphism `A ⊗ₙ B ⟶ C`.  This is a
-genuine equivariant morphism of nominal sets. -/
+/-- **Uncurrying**: transpose a morphism `A ⟶ (B ⊸ₙ C)` to a morphism `A ⊗ₙ B ⟶ C`.  This is an
+equivariant morphism of nominal sets. -/
 def uncurry {A B C : Nom} (h : A ⟶ B ⊸ₙ C) : A ⊗ₙ B ⟶ C :=
   ObjectProperty.homMk (uncurryActionHom h)
 
@@ -246,7 +248,7 @@ lemma transpose_agree_on_sep {A B C : Nom} (h h' : A ⟶ B ⊸ₙ C)
     (hsep : Separated A.obj B.obj a b) :
     (h.hom.hom a).1 b = (h'.hom.hom a).1 b := by
   have := congrArg (fun (m : A ⊗ₙ B ⟶ C) => m.hom.hom ⟨(a, b), hsep⟩) heq
-  simpa using this
+  exact this
 
 /-! ## STEP 3 — the adjunction and `MonoidalClosed Nom`
 
@@ -279,7 +281,7 @@ Sets*).  A single fresh renaming cannot compute this value, because an atom of `
 cannot be moved out of `supp a` by any permutation fixing `supp a`.  The provided
 `funGSetFull_apply_of_supports` is exactly the *movable* half of this determination (transport by a
 support-fixing permutation); the fixed-overlap half is the classical freshness/`some/any`-quantifier
-theorem, and is the load-bearing residual.
+theorem, and is the residual.
 
 Concretely, the ingredients are:
 

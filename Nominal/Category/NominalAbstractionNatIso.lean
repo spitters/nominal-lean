@@ -20,7 +20,7 @@ functor `res : Nom ⥤ NomFin` to the finitely-supported-permutation side (the S
 identification, completed to an equivalence in `NominalCoreEquivalenceComplete`).
 
 This file promotes the object-level fact "abstraction is the same construction on both sides" to a
-genuine **natural isomorphism of functors** over the category `NomFin`. It supplies:
+**natural isomorphism of functors** over the category `NomFin`. It supplies:
 
 1. `absFinF : NomFin ⥤ NomFin` — the native atom-abstraction endofunctor on `NomFin`, the `FinPerm`
    copy of `absF`. It mirrors `absObj`/`absF` verbatim over the finitely-supported permutation
@@ -227,7 +227,7 @@ def absHomFin {X Y : GSetFin} (f : X ⟶ Y) : absGSetFin X ⟶ absGSetFin Y wher
       show Quotient.mk (absSetoidFin Y) (π p.1, f.hom (X.act π p.2))
         = Quotient.mk (absSetoidFin Y) (π p.1, Y.act π (f.hom p.2))
       have hc : f.hom (X.act π p.2) = Y.act π (f.hom p.2) := by
-        simpa only [ConcreteCategory.comp_apply] using ConcreteCategory.congr_hom (f.comm π) p.2
+        simpa only [ConcreteCategory.comp_apply] using! ConcreteCategory.congr_hom (f.comm π) p.2
       rw [hc]
 
 /-- Atom abstraction as an endofunctor on `NomFin`. The `FinPerm` copy of `absF`. -/

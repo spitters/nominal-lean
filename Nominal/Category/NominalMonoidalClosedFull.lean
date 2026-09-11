@@ -13,7 +13,7 @@ set_option autoImplicit false
 # M3, part 2 — the determined-by-fresh theory and the exponential obstruction
 
 This file continues `CatCrypt.Category.NominalMonoidalClosed` toward monoidal closure of `Nom`
-for the separated product `⊗ₙ`.  It proves the genuine **determined-by-fresh-values** lemmas that
+for the separated product `⊗ₙ`.  It proves the **determined-by-fresh-values** lemmas that
 the internal-hom development rests on, and then pins down *precisely* why the naive internal hom
 `funObj` (total finitely-supported functions) does **not** carry a `MonoidalClosed Nom` structure
 for the separated product.
@@ -40,7 +40,7 @@ object — the **separated (fresh) function space** consisting of functions dete
 values on *fresh* arguments only.  `uncurry_not_injective` witnesses the gap concretely: two
 distinct morphisms into `funObj` that agree on all separated pairs, hence have equal uncurryings.
 Registering `Closed B` / `MonoidalClosed Nom` with `funObj` would require an inverse to a
-non-injective map, so it is impossible — not merely unproved.  The precise residual is therefore
+non-injective map, so it is impossible.  The precise residual is therefore
 "replace `funObj` by the separated function space", documented at the end of this file.
 
 ## References
@@ -169,7 +169,6 @@ noncomputable def indicElt (a : Atom) : funCarrier atomGSet boolGSet :=
     intro π hπ
     funext x
     have hpa : π a = a := hπ a (Finset.mem_singleton_self a)
-    simp only [funGSetFull_ρ, boolGSet_ρ, atomGSet_ρ]
     exact decide_eq_of_iff ((perm_inv_eq_iff π x a).trans (iff_of_eq (congrArg (x = ·) hpa)))⟩
 
 /-- The constant-`false` function, supported by `∅`. -/
@@ -224,9 +223,7 @@ lemma indicMor_ne_constFalse : indicMor ≠ constFalseMor := by
   intro heq
   have h := congrArg
     (fun m : atomObj ⟶ (atomObj ⊸ₙ boolObj) => (m.hom.hom (0 : Atom)).1 (0 : Atom)) heq
-  simp only [indicMor, constFalseMor, ObjectProperty.homMk_hom, indicActionHom,
-    constFalseActionHom, constFalseElt] at h
-  simp [indicElt] at h
+  exact absurd rfl (decide_eq_false_iff_not.mp h)
 
 /-- **The obstruction.**  For the total finitely-supported function internal hom `funObj`, the
 transpose `uncurry` is not injective: there exist distinct `h ≠ h' : 𝔸 ⟶ (𝔸 ⊸ₙ 𝟚)` with

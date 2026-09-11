@@ -67,11 +67,10 @@ lemma atomGSet_supports_mem {s : Finset Atom} {a : Atom} (hsupp : Supports atomG
   obtain ⟨c, hc⟩ := Infinite.exists_notMem_finset (insert a s)
   rw [Finset.mem_insert, not_or] at hc
   obtain ⟨hca, hcs⟩ := hc
-  have hfix : atomGSet.act (Equiv.swap a c) a = a :=
+  have hfix : Equiv.swap a c a = a :=
     hsupp (Equiv.swap a c) (fun e he =>
       Equiv.swap_apply_of_ne_of_ne (fun hh => ha (hh ▸ he)) (fun hh => hcs (hh ▸ he)))
-  rw [show atomGSet.act (Equiv.swap a c) a = Equiv.swap a c a from rfl,
-    Equiv.swap_apply_left] at hfix
+  rw [Equiv.swap_apply_left] at hfix
   exact hca hfix
 
 /-- Every atom lies in its own least support. -/
@@ -90,7 +89,7 @@ lemma absToExpFun_supported (X : Nom) {s : Finset Atom} {a : Atom} {x : X.obj.V}
     (hs : Supports X.obj s x) :
     Supports (funGSetFull atomObj.obj X.obj) (insert a s) (absToExpFun X a x) := by
   intro π hπ
-  funext b
+  apply funext; intro (b : Atom)
   have hπa : π a = a := hπ a (Finset.mem_insert_self a s)
   have hx : X.obj.act π x = x := hs π (fun c hc => hπ c (Finset.mem_insert_of_mem hc))
   show X.obj.act π (X.obj.act (Equiv.swap a (π⁻¹ b)) x) = X.obj.act (Equiv.swap a b) x
@@ -170,10 +169,7 @@ lemma absToExpCarrier_smul (X : Nom) (π : PermAtom) (a : Atom) (x : X.obj.V) :
     (funGSet atomObj.obj X.obj).act π (absToExpCarrier X a x)
       = absToExpCarrier X (π a) (X.obj.act π x) := by
   apply Subtype.ext
-  funext b
-  show (funGSetFull atomObj.obj X.obj).act π (absToExpFun X a x) b
-      = X.obj.act (Equiv.swap (π a) b) (X.obj.act π x)
-  rw [funGSetFull_ρ]
+  apply funext; intro (b : Atom)
   show X.obj.act π (X.obj.act (Equiv.swap a (π⁻¹ b)) x)
       = X.obj.act (Equiv.swap (π a) b) (X.obj.act π x)
   have hpi : π (π⁻¹ b) = b := by

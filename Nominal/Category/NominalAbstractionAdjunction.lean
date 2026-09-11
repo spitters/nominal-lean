@@ -28,10 +28,10 @@ functor `absF` of `CatCrypt.Category.NominalAbstraction`.
 `concretize X : (𝔸 ⊗ₙ [𝔸]X) ⟶ X` opens an abstraction at a fresh atom:
 on a separated pair `(a, ⟦(b, x)⟧)` (the separation gives `a # ⟦(b, x)⟧`) it returns
 `swap a b • x`. This closes the residual left open in `NominalAbstraction` ("Residual:
-concretion"): well-definedness on the `AbsRel` quotient at the *given* atom `a` genuinely
+concretion"): well-definedness on the `AbsRel` quotient at the *given* atom `a`
 requires freshness (it fails for non-fresh `a`), which the least-support theory supplies.
 
-The load-bearing lemmas are:
+The lemmas used are:
 
 * `supp_smul` — equivariance of the least support, `supp (π • x) = (supp x).image π`;
 * `fresh_abs` — if `a` is fresh for `⟦(b, x)⟧` and `a ≠ b` then `a` is fresh for `x`
@@ -286,17 +286,16 @@ lemma unitVal_eq {A : Nom} {a : Atom} {x : A.obj.V} (h : a ∉ supp A.property x
 lemma unitVal_equivariant {A : Nom} (π : PermAtom) (x : A.obj.V) :
     (absGSet (sepGSet atomGSet A.obj)).act π (unitVal A x) = unitVal A (A.obj.act π x) := by
   have hfx := freshFor_spec A x
-  rw [unitVal_eq hfx, absGSet_ρ_mk]
   have hπfresh : (π (freshFor A x)) ∉ supp A.property (A.obj.act π x) := by
     rw [supp_smul A.property π x, Finset.mem_image]
     rintro ⟨c, hc, hceq⟩
     exact hfx (π.injective hceq ▸ hc)
-  rw [unitVal_eq hπfresh]
   have hpair : (sepGSet atomGSet A.obj).act π ⟨(freshFor A x, x), sep_atom_of_fresh hfx⟩
       = (⟨(π (freshFor A x), A.obj.act π x), sep_atom_of_fresh hπfresh⟩ :
         sepCarrier atomGSet A.obj) :=
     Subtype.ext rfl
-  rw [hpair]
+  rw [unitVal_eq hfx, unitVal_eq hπfresh]
+  exact congrArg (absPt (sepGSet atomGSet A.obj) (π (freshFor A x))) hpair
 
 /-- The underlying `GSet` morphism of the unit. -/
 noncomputable def unitHom (A : Nom) : A.obj ⟶ absGSet (sepGSet atomGSet A.obj) where
@@ -341,7 +340,7 @@ lemma homEquiv_right_inv (A B : Nom) (g : A ⟶ absF.obj B) :
   apply ObjectProperty.hom_ext
   apply Action.Hom.ext
   apply ConcreteCategory.hom_ext; intro x
-  rw [homEquivToFun_apply, homEquivInvFun_apply]
+  rw [homEquivToFun_apply]
   exact absPt_concValue (hX := B.property)
     (fresh_map A.property (absGSet_isNominal B.property) g.hom (freshFor_spec A x))
 
@@ -349,8 +348,10 @@ lemma homEquiv_right_inv (A B : Nom) (g : A ⟶ absF.obj B) :
 lemma homEquiv_left_inv_apply (A B : Nom) (f : (atomObj ⊗ₙ A) ⟶ B)
     (p : sepCarrier atomGSet A.obj) :
     (homEquivInvFun A B (homEquivToFun A B f)).hom.hom p = f.hom.hom p := by
-  obtain ⟨⟨a, x⟩, hsep⟩ := p
-  rw [homEquivInvFun_apply, homEquivToFun_apply]
+  obtain ⟨⟨(a : Atom), x⟩, hsep⟩ := p
+  show concValue a (absPt B.obj (freshFor A x)
+      (f.hom.hom ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩))
+    = f.hom.hom ⟨(a, x), hsep⟩
   have hax : a ∉ supp A.property x := fresh_of_sep A.property hsep
   have ha0x : freshFor A x ∉ supp A.property x := freshFor_spec A x
   have hz_supp : Supports B.obj ({freshFor A x} ∪ supp A.property x)
@@ -378,13 +379,11 @@ lemma homEquiv_left_inv_apply (A B : Nom) (f : (atomObj ⊗ₙ A) ⟶ B)
   have hwpair : (sepGSet atomGSet A.obj).act (Equiv.swap a (freshFor A x))
         ⟨(freshFor A x, x), sep_atom_of_fresh (freshFor_spec A x)⟩
       = (⟨(a, x), hsep⟩ : sepCarrier atomGSet A.obj) := by
-    rw [sepGSet_ρ_mk]
     apply Subtype.ext
-    show (atomGSet.act (Equiv.swap a (freshFor A x)) (freshFor A x),
+    show ((Equiv.swap a (freshFor A x)) (freshFor A x),
       A.obj.act (Equiv.swap a (freshFor A x)) x) = (a, x)
-    rw [atomGSet_ρ_apply, Equiv.swap_apply_right,
-      swap_apply_eq_self (supp_supports A.property x) hax ha0x]
-  rw [hwpair]
+    rw [Equiv.swap_apply_right, swap_apply_eq_self (supp_supports A.property x) hax ha0x]
+  exact congrArg (fun q => f.hom.hom q) hwpair
 
 /-- `invFun ∘ toFun = id`. -/
 lemma homEquiv_left_inv (A B : Nom) (f : (atomObj ⊗ₙ A) ⟶ B) :

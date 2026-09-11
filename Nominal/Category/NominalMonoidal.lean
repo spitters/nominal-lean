@@ -233,8 +233,9 @@ lemma sep_a_bc {a : A.obj.V} {b : B.obj.V} {c : C.obj.V}
     (hab : Separated A.obj B.obj a b)
     (houter : Separated (sepGSet A.obj B.obj) C.obj ⟨(a, b), hab⟩ c) :
     Separated A.obj (sepGSet B.obj C.obj) a ⟨(b, c), sep_bc hab houter⟩ := by
-  rw [Separated_iff_disjoint A.property (sepGSet_isNominal B.property C.property),
-    supp_pair B.property C.property (sep_bc hab houter), Finset.disjoint_union_right]
+  refine (Separated_iff_disjoint A.property (sepGSet_isNominal B.property C.property) a
+    ⟨(b, c), sep_bc hab houter⟩).mpr ?_
+  rw [supp_pair B.property C.property (sep_bc hab houter), Finset.disjoint_union_right]
   refine ⟨(Separated_iff_disjoint A.property B.property a b).mp hab, ?_⟩
   have h1 := (Separated_iff_disjoint (sepGSet_isNominal A.property B.property) C.property
     ⟨(a, b), hab⟩ c).mp houter
@@ -257,8 +258,9 @@ lemma sep_ab_c {a : A.obj.V} {b : B.obj.V} {c : C.obj.V}
     (hbc : Separated B.obj C.obj b c)
     (houter : Separated A.obj (sepGSet B.obj C.obj) a ⟨(b, c), hbc⟩) :
     Separated (sepGSet A.obj B.obj) C.obj ⟨(a, b), sep_ab hbc houter⟩ c := by
-  rw [Separated_iff_disjoint (sepGSet_isNominal A.property B.property) C.property,
-    supp_pair A.property B.property (sep_ab hbc houter), Finset.disjoint_union_left]
+  refine (Separated_iff_disjoint (sepGSet_isNominal A.property B.property) C.property
+    ⟨(a, b), sep_ab hbc houter⟩ c).mpr ?_
+  rw [supp_pair A.property B.property (sep_ab hbc houter), Finset.disjoint_union_left]
   refine ⟨?_, (Separated_iff_disjoint B.property C.property b c).mp hbc⟩
   have h1 := (Separated_iff_disjoint A.property (sepGSet_isNominal B.property C.property)
     a ⟨(b, c), hbc⟩).mp houter
@@ -365,7 +367,7 @@ The development, built on STEP 1 and STEP 2, proceeds in order:
 * the two triangle/naturality identities of the adjunction, giving `Closed A` for every `A` and
   hence `MonoidalClosed Nom`.
 
-The load-bearing prerequisite (least-support / `supp`) is provided by STEP 1; the closure itself
+The prerequisite (least-support / `supp`) is provided by STEP 1; the closure itself
 is assembled in `NominalSeparatedExp` (the separated exponential `⊸ₛ`) and completed in
 `NominalMonoidalClosedComplete`. -/
 

@@ -277,7 +277,7 @@ noncomputable def extFunctor : NomFin ⥤ Nom where
                 (f.hom.hom x)
           have hcomm : f.hom.hom (X.obj.act (extendPerm (fromPermℕ π) (suppFin X.property x)) x)
               = Y.obj.act (extendPerm (fromPermℕ π) (suppFin X.property x)) (f.hom.hom x) := by
-            simpa only [ConcreteCategory.comp_apply] using
+            simpa only [ConcreteCategory.comp_apply] using!
               ConcreteCategory.congr_hom
                 (f.hom.comm (extendPerm (fromPermℕ π) (suppFin X.property x))) x
           rw [hcomm]

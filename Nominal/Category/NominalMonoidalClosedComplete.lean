@@ -34,7 +34,7 @@ inverse transpose — a *finitely-supported totalization* of the fresh-value ass
   `uncurryQ_injective`).
 * **`instance : MonoidalClosed Nom`** — assembled from the transpose bijection.
 
-The load-bearing technique throughout is the *fresh-renaming reduction* already used in
+The technique throughout is the *fresh-renaming reduction* already used in
 `freshAgree_trans`/`uncurryQ_injective`: any fresh-agreement obligation at an arbitrary argument
 `b` is transported by a support-fixing permutation to a *fully separated* argument, where both
 sides collapse to `g`-values and agree by `curry_sep_transport`.
@@ -348,7 +348,7 @@ noncomputable def funSepMapActionHom {Y Y' : Nom} (k : Y ⟶ Y') :
           ((funGSet B.obj Y'.obj).act π ((funMapActionHom k).hom f))
       refine congrArg _ ?_
       have hc := ConcreteCategory.congr_hom ((funMapActionHom k).comm π) f
-      simpa only [ConcreteCategory.comp_apply] using hc
+      simpa only [ConcreteCategory.comp_apply] using! hc
 
 @[simp] lemma funSepMapActionHom_mk {Y Y' : Nom} (k : Y ⟶ Y') (f : funCarrier B.obj Y.obj) :
     (funSepMapActionHom k).hom (Quotient.mk (freshAgreeSetoid B Y) f)
@@ -403,9 +403,8 @@ lemma uncurryQ_comp_map {X Y Y' : Nom} (h : X ⟶ B ⊸ₛ Y) (g : Y ⟶ Y') :
       supp_le (funGSet_isNominal B.obj Y'.obj)
         (Supports.map (funMapActionHom g) (fsupp_supports B Y f'))
     exact hf'b.mono_left hsub
-  rw [evalCls_eq B Y' ((h ≫ (funSepFunctor B).map g).hom.hom a) b _
-    ((funMapActionHom g).hom f') hmap.symm hf'b']
-  rfl
+  exact evalCls_eq B Y' ((h ≫ (funSepFunctor B).map g).hom.hom a) b _
+    ((funMapActionHom g).hom f') hmap.symm hf'b'
 
 /-! ## The adjunction and `MonoidalClosed Nom` -/
 
