@@ -4,7 +4,10 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
-
+  # The heavy jobs run on this schedule, on demand, and on pull requests;
+  # a push to the default branch runs only the cheap gates (see each job's `if`).
+  schedule:
+    - cron: '0 4 * * 0'
 # Allow the workflow to publish to GitHub Pages.
 permissions:
   contents: read
@@ -18,6 +21,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
