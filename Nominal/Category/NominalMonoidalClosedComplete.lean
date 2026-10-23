@@ -119,13 +119,13 @@ lemma curryFn_sep (g : A ⊗ₙ B ⟶ C) (a : A.obj.V) {b : B.obj.V}
     (hsep : Separated A.obj B.obj a b) :
     curryFn g a b = g.hom.hom ⟨(a, b), hsep⟩ := by
   have hB : Nonempty B.obj.V := ⟨b⟩
-  simp only [curryFn, dif_pos hB, dif_pos hsep]
+  simp only [curryFn, dite_eq_left hB, dite_eq_left hsep]
 
 /-- `curryFn` off the separated locus is the constant default. -/
 lemma curryFn_dflt (g : A ⊗ₙ B ⟶ C) (a : A.obj.V) {b : B.obj.V}
     (hB : Nonempty B.obj.V) (hsep : ¬ Separated A.obj B.obj a b) :
     curryFn g a b = curryDflt g a hB := by
-  simp only [curryFn, dif_pos hB, dif_neg hsep]
+  simp only [curryFn, dite_eq_left hB, dite_eq_right hsep]
 
 /-- `curryFn g a` is finitely supported. -/
 lemma curryFn_hasFinSupp (g : A ⊗ₙ B ⟶ C) (a : A.obj.V) :

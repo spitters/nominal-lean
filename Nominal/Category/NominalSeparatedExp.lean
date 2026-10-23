@@ -259,17 +259,17 @@ def sepExpCarrier (B C : Nom) : Type := Quotient (freshAgreeSetoid B C)
 def sepExpGSet (B C : Nom) : GSet where
   V := sepExpCarrier B C
   ρ :=
-    { toFun := fun π => TypeCat.ofHom (Quotient.lift
+    { toFun := fun π => End.of <| TypeCat.ofHom (Quotient.lift
         (fun f => Quotient.mk (freshAgreeSetoid B C) ((funGSet B.obj C.obj).act π f))
         (fun _ _ hfg => Quotient.sound (freshAgree_congr hfg π)))
       map_one' := by
-        apply ConcreteCategory.hom_ext; intro X
+        apply End.ext; apply ConcreteCategory.hom_ext; intro X
         induction X using Quotient.inductionOn with
         | _ f =>
           show Quotient.mk _ ((funGSet B.obj C.obj).act 1 f) = Quotient.mk _ f
           exact congrArg (Quotient.mk (freshAgreeSetoid B C)) (GSet.act_one ..)
       map_mul' := fun a b => by
-        apply ConcreteCategory.hom_ext; intro X
+        apply End.ext; apply ConcreteCategory.hom_ext; intro X
         induction X using Quotient.inductionOn with
         | _ f =>
           show Quotient.mk _ ((funGSet B.obj C.obj).act (a * b) f)

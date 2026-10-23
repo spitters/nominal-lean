@@ -186,7 +186,7 @@ lemma concValue_absPt {hX : IsNominal X} {a b : Atom} {x : X.V}
     (hfresh : a ∉ supp (absGSet_isNominal hX) (absPt X b x)) :
     concValue a (absPt X b x) = X.act (Equiv.swap a b) x := by
   have hex : ∃ y : X.V, absPt X a y = absPt X b x := ⟨_, absPt_swap_eq (hX := hX) hfresh⟩
-  rw [concValue, dif_pos hex]
+  rw [concValue, dite_eq_left hex]
   exact absPt_inj_body (hex.choose_spec.trans (absPt_swap_eq (hX := hX) hfresh).symm)
 
 /-- **Equivariance of concretion** on fresh pairs. -/

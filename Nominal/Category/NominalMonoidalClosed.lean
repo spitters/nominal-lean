@@ -57,13 +57,13 @@ namespace Nominal
 def funGSetFull (A B : GSet) : GSet where
   V := A.V → B.V
   ρ :=
-    { toFun := fun π => TypeCat.ofHom fun f x => B.act π (f (A.act π⁻¹ x))
+    { toFun := fun π => End.of <| TypeCat.ofHom fun f x => B.act π (f (A.act π⁻¹ x))
       map_one' := by
-        apply ConcreteCategory.hom_ext; intro f; funext x
+        apply End.ext; apply ConcreteCategory.hom_ext; intro f; funext x
         show B.act 1 (f (A.act (1 : PermAtom)⁻¹ x)) = f x
         rw [inv_one, GSet.act_one, GSet.act_one]
       map_mul' := fun a b => by
-        apply ConcreteCategory.hom_ext; intro f; funext x
+        apply End.ext; apply ConcreteCategory.hom_ext; intro f; funext x
         show B.act (a * b) (f (A.act (a * b)⁻¹ x))
           = B.act a (B.act b (f (A.act b⁻¹ (A.act a⁻¹ x))))
         rw [GSet.act_mul, mul_inv_rev, GSet.act_mul] }
@@ -79,17 +79,17 @@ The restriction is well defined because supports are equivariant (`Supports.smul
 def funGSet (A B : GSet) : GSet where
   V := funCarrier A B
   ρ :=
-    { toFun := fun π => TypeCat.ofHom fun f =>
+    { toFun := fun π => End.of <| TypeCat.ofHom fun f =>
         ⟨(funGSetFull A B).act π f.1, by
           obtain ⟨s, hs⟩ := f.2
           exact ⟨s.image π, hs.smul π⟩⟩
       map_one' := by
-        apply ConcreteCategory.hom_ext; intro f
+        apply End.ext; apply ConcreteCategory.hom_ext; intro f
         apply Subtype.ext
         show (funGSetFull A B).act 1 f.1 = f.1
         exact GSet.act_one ..
       map_mul' := fun a b => by
-        apply ConcreteCategory.hom_ext; intro f
+        apply End.ext; apply ConcreteCategory.hom_ext; intro f
         apply Subtype.ext
         show (funGSetFull A B).act (a * b) f.1
           = (funGSetFull A B).act a ((funGSetFull A B).act b f.1)

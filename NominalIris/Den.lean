@@ -65,11 +65,11 @@ theorem den_op (x y : NameRA) : (den (x • y) : NomProp) ⊣⊢ iprop(den x ∗
     | valid b =>
       rw [op_valid_valid]
       by_cases h : a ## b
-      · rw [if_pos h, den_valid, NameSet.toFinset_union, den_valid, den_valid]
+      · rw [ite_eq_left h, den_valid, NameSet.toFinset_union, den_valid, den_valid]
         exact (worldProp_sep ((NameSet.disjoint_iff a b).mp h)).symm
       · have hnd : ¬ Disjoint a.toFinset b.toFinset :=
           fun hd => h ((NameSet.disjoint_iff a b).mpr hd)
-        rw [if_neg h, den_error, den_valid, den_valid]
+        rw [ite_eq_right h, den_error, den_valid, den_valid]
         constructor
         · intro σ hσ; exact hσ.elim
         · intro σ hσ; exact (hnd (worldProp_sep_disjoint a.toFinset b.toFinset σ hσ)).elim

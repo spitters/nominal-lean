@@ -63,7 +63,7 @@ theorem mem_iff_val (a : Atom) (w : NameWorld) : (⟨a.val⟩ : Atom) ∈ w ↔ 
   rw [show (⟨a.val⟩ : Atom) = a from rfl]
 
 theorem toNS_empty : toNS ∅ = (∅ : NomState) := by
-  funext i; rw [toNS_apply, if_neg (Finset.notMem_empty _)]; rfl
+  funext i; rw [toNS_apply, ite_eq_right (Finset.notMem_empty _)]; rfl
 
 theorem toNS_injective : Function.Injective toNS := by
   intro w₁ w₂ h
@@ -78,12 +78,12 @@ theorem toNS_disjoint_iff (w₁ w₂ : NameWorld) :
   constructor
   · intro h a ha1 ha2
     rcases h a.val with h1 | h1
-    · rw [toNS_apply, if_pos (by simpa using ha1)] at h1; exact absurd h1 (by simp)
-    · rw [toNS_apply, if_pos (by simpa using ha2)] at h1; exact absurd h1 (by simp)
+    · rw [toNS_apply, ite_eq_left (by simpa using ha1)] at h1; exact absurd h1 (by simp)
+    · rw [toNS_apply, ite_eq_left (by simpa using ha2)] at h1; exact absurd h1 (by simp)
   · intro h i
     by_cases hi1 : (⟨i⟩ : Atom) ∈ w₁
-    · exact Or.inr (by rw [toNS_apply, if_neg (h hi1)])
-    · exact Or.inl (by rw [toNS_apply, if_neg hi1])
+    · exact Or.inr (by rw [toNS_apply, ite_eq_right (h hi1)])
+    · exact Or.inl (by rw [toNS_apply, ite_eq_right hi1])
 
 theorem toNS_union {w₁ w₂ : NameWorld} (h : Disjoint w₁ w₂) :
     toNS (w₁ ∪ w₂) = toNS w₁ ∪ toNS w₂ := by

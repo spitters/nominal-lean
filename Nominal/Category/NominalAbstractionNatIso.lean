@@ -141,17 +141,17 @@ theorem AbsRelFin_smul {X : GSetFin} (π : FinPerm) {p q : CatCrypt.Nominal.Atom
 def absGSetFin (X : GSetFin) : GSetFin where
   V := Quotient (absSetoidFin X)
   ρ :=
-    { toFun := fun π => TypeCat.ofHom
+    { toFun := fun π => End.of <| TypeCat.ofHom
         (Quotient.map (fun p => (π p.1, X.act π p.2)) (fun _ _ h => AbsRelFin_smul π h))
       map_one' := by
-        apply ConcreteCategory.hom_ext; intro q
+        apply End.ext; apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
           show Quotient.mk (absSetoidFin X) ((1 : FinPerm) p.1, X.act (1 : FinPerm) p.2)
             = Quotient.mk (absSetoidFin X) p
           rw [FinPerm.one_apply, GSetFin.act_one]
       map_mul' := fun a b => by
-        apply ConcreteCategory.hom_ext; intro q
+        apply End.ext; apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
           show Quotient.mk (absSetoidFin X) ((a * b) p.1, X.act (a * b) p.2)

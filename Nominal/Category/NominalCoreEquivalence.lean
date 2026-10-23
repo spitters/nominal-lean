@@ -86,10 +86,11 @@ namespace GSetFin
 
 variable (X : GSetFin)
 
-/-- Apply a `FinPerm`-set action to a point. As with `GSet.act`, the `End`-valued action
-`X.ρ τ : End X.V` is a categorical endomorphism in Lean 4.30, so applying it to a point goes
-through `ConcreteCategory.hom`. -/
-abbrev act (τ : CatCrypt.Nominal.FinPerm) (x : X.V) : X.V := ConcreteCategory.hom (X.ρ τ) x
+/-- Apply a `FinPerm`-set action to a point. As with `GSet.act`, the action
+`X.ρ τ : End X.V` wraps a categorical endomorphism, so applying it to a point goes
+through `End.asHom` and `ConcreteCategory.hom`. -/
+abbrev act (τ : CatCrypt.Nominal.FinPerm) (x : X.V) : X.V :=
+  ConcreteCategory.hom (X.ρ τ).asHom x
 
 end GSetFin
 
@@ -254,16 +255,17 @@ noncomputable def extGSet (X : GSetFin) (suppOf : X.V → Finset CatCrypt.Nomina
     GSet where
   V := X.V
   ρ :=
-    { toFun := fun π => TypeCat.ofHom (fun x => X.act (extendPerm (fromPermℕ π) (suppOf x)) x)
+    { toFun := fun π =>
+        End.of <| TypeCat.ofHom (fun x => X.act (extendPerm (fromPermℕ π) (suppOf x)) x)
       map_one' := by
-        apply ConcreteCategory.hom_ext; intro x
+        apply End.ext; apply ConcreteCategory.hom_ext; intro x
         show X.act (extendPerm (fromPermℕ 1) (suppOf x)) x = x
         rw [fromPermℕ_one]
         refine hsupp x _ ?_
         intro a ha
         rw [extendPerm_spec 1 _ a ha]; rfl
       map_mul' := fun π σ => by
-        apply ConcreteCategory.hom_ext; intro x
+        apply End.ext; apply ConcreteCategory.hom_ext; intro x
         show X.act (extendPerm (fromPermℕ (π * σ)) (suppOf x)) x
             = X.act (extendPerm (fromPermℕ π)
                 (suppOf (X.act (extendPerm (fromPermℕ σ) (suppOf x)) x)))
@@ -319,9 +321,11 @@ exhibit the round-trip `res.obj (coreToNom α) ≅ coreObjFin α`. -/
 noncomputable def coreGSetFin (α : Type) [NomSet α] : GSetFin where
   V := α
   ρ :=
-    { toFun := fun τ => TypeCat.ofHom (fun x => τ • x)
-      map_one' := by apply ConcreteCategory.hom_ext; intro x; exact one_smul _ x
-      map_mul' := fun a b => by apply ConcreteCategory.hom_ext; intro x; exact mul_smul a b x }
+    { toFun := fun τ => End.of <| TypeCat.ofHom (fun x => τ • x)
+      map_one' := by
+        apply End.ext; apply ConcreteCategory.hom_ext; intro x; exact one_smul _ x
+      map_mul' := fun a b => by
+        apply End.ext; apply ConcreteCategory.hom_ext; intro x; exact mul_smul a b x }
 
 /-- A core nominal set is finitely supported for its `FinPerm`-action, via `NomSet.supp`. -/
 lemma coreGSetFin_isNominalFin (α : Type) [NomSet α] : IsNominalFin (coreGSetFin α) :=

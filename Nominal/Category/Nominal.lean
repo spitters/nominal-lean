@@ -78,10 +78,10 @@ namespace GSet
 
 variable (X : GSet)
 
-/-- Apply a `G`-set action to a point. In Lean 4.30 the `End`-valued action
-`X.ρ π : End X.V` is a categorical endomorphism rather than a bare function, so
-applying it to a point goes through `ConcreteCategory.hom`. -/
-abbrev act (π : PermAtom) (x : X.V) : X.V := ConcreteCategory.hom (X.ρ π) x
+/-- Apply a `G`-set action to a point. The action `X.ρ π : End X.V` is a structure
+wrapping a categorical endomorphism, so applying it to a point goes through
+`End.asHom` and `ConcreteCategory.hom`. -/
+abbrev act (π : PermAtom) (x : X.V) : X.V := ConcreteCategory.hom (X.ρ π).asHom x
 
 /-- The action is a left action: the identity permutation acts as the identity. -/
 @[simp] lemma act_one (x : X.V) : X.act 1 x = x := by
@@ -150,10 +150,10 @@ Every atom `a` is supported by `{a}`. -/
 def atomGSet : GSet where
   V := Atom
   ρ :=
-    { toFun := fun π => TypeCat.ofHom (π : Atom → Atom)
+    { toFun := fun π => End.of <| TypeCat.ofHom (π : Atom → Atom)
       map_one' := rfl
       map_mul' := fun a b => by
-        apply ConcreteCategory.hom_ext; intro x; rfl }
+        apply End.ext; apply ConcreteCategory.hom_ext; intro x; rfl }
 
 /-- The atom object is nominal: each atom `a` is supported by `{a}`. -/
 lemma atomGSet_isNominal : IsNominal atomGSet :=
@@ -221,14 +221,14 @@ def sepCarrier (A B : GSet) : Type := { p : A.V × B.V // Separated A B p.1 p.2 
 def sepGSet (A B : GSet) : GSet where
   V := sepCarrier A B
   ρ :=
-    { toFun := fun π => TypeCat.ofHom fun p => ⟨(A.act π p.1.1, B.act π p.1.2), p.2.smul π⟩
+    { toFun := fun π => End.of <| TypeCat.ofHom fun p => ⟨(A.act π p.1.1, B.act π p.1.2), p.2.smul π⟩
       map_one' := by
-        apply ConcreteCategory.hom_ext; intro p
+        apply End.ext; apply ConcreteCategory.hom_ext; intro p
         apply Subtype.ext
         show (A.act 1 p.1.1, B.act 1 p.1.2) = (p.1.1, p.1.2)
         rw [GSet.act_one, GSet.act_one]
       map_mul' := fun a b => by
-        apply ConcreteCategory.hom_ext; intro p
+        apply End.ext; apply ConcreteCategory.hom_ext; intro p
         apply Subtype.ext
         show (A.act (a * b) p.1.1, B.act (a * b) p.1.2)
           = (A.act a (A.act b p.1.1), B.act a (B.act b p.1.2))

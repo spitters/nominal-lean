@@ -163,17 +163,17 @@ diagonal action `π • ⟦(a, x)⟧ = ⟦(π a, X.act π x)⟧`. -/
 def absGSet (X : GSet) : GSet where
   V := Quotient (absSetoid X)
   ρ :=
-    { toFun := fun π => TypeCat.ofHom
+    { toFun := fun π => End.of <| TypeCat.ofHom
         (Quotient.map (fun p => (π p.1, X.act π p.2)) (fun _ _ h => AbsRel_smul π h))
       map_one' := by
-        apply ConcreteCategory.hom_ext; intro q
+        apply End.ext; apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
           show Quotient.mk (absSetoid X) ((1 : PermAtom) p.1, X.act (1 : PermAtom) p.2)
             = Quotient.mk (absSetoid X) p
           rw [Equiv.Perm.one_apply, GSet.act_one]
       map_mul' := fun a b => by
-        apply ConcreteCategory.hom_ext; intro q
+        apply End.ext; apply ConcreteCategory.hom_ext; intro q
         induction q using Quotient.inductionOn with
         | _ p =>
           show Quotient.mk (absSetoid X) ((a * b) p.1, X.act (a * b) p.2)
