@@ -17,7 +17,7 @@ The nominal λ-terms `Tm` (α-quotiented, `Nominal.Lambda`) and the name-allocat
 ghost state (`NominalIris.Camera`) share the one `Atom` framework, so binding can
 be expressed *in Iris*: a typing context is a ghost **name allocator**, the
 `(Abs)` rule allocates its bound variable as the `name_alloc` view-shift, and the
-allocated fresh name binds a genuine α-correct nominal abstraction `Tm.lam`.
+allocated fresh name binds an α-correct nominal abstraction `Tm.lam`.
 
 * `ownCtx` / `abs_alloc` / `binders_distinct` — the binding model over `Atom`.
 * `Tm.bound_not_free` — the bound name of a nominal abstraction is not free in it.
@@ -75,15 +75,15 @@ theorem ctxNS_cons (a : Atom) (T : Ty) (Γ : Ctx) :
 
 section Binding
 
-variable {Fr : Type _} [UFraction Fr] {GF : BundledGFunctors}
+variable {GF : BundledGFunctors}
 
 /-- A typing context realised as a ghost name allocator. -/
-def ownCtx (γ : GName) [HasNameAlloc γ GF Fr] (Γ : Ctx) : IProp GF :=
+def ownCtx (γ : GName) [HasNameAlloc γ GF] (Γ : Ctx) : IProp GF :=
   nAuth γ (NameSet.ofFinset (ctxDom Γ))
 
 /-- **The `(Abs)` rule as fresh-name allocation.** Allocate a fresh binder for
 the context, obtaining `a # Γ`, ownership of it, and the extended context. -/
-theorem abs_alloc (γ : GName) [HasNameAlloc γ GF Fr] (Γ : Ctx) (S : Ty) :
+theorem abs_alloc (γ : GName) [HasNameAlloc γ GF] (Γ : Ctx) (S : Ty) :
     ownCtx γ Γ ⊢ |==> ∃ a : Atom, ⌜a ∉ ctxDom Γ⌝ ∗ nFresh γ a ∗ ownCtx γ ((a, S) :: Γ) := by
   obtain ⟨a, ha⟩ : ∃ a, a ∉ ctxDom Γ := ⟨Atom.fresh (ctxDom Γ), Atom.fresh_not_mem _⟩
   unfold ownCtx nAuth nFresh
@@ -94,13 +94,13 @@ theorem abs_alloc (γ : GName) [HasNameAlloc γ GF Fr] (Γ : Ctx) (S : Ty) :
   iexists a
   rw [ctxNS_cons]
   isplit
-  · ipure_intro; exact ha
+  · ipureintro; exact ha
   · isplitl [Hf]
     · iexact Hf
     · iexact Hauth
 
 /-- **Context well-formedness is separation**: two owned binder names are distinct. -/
-theorem binders_distinct (γ : GName) [HasNameAlloc γ GF Fr] (a b : Atom) :
+theorem binders_distinct (γ : GName) [HasNameAlloc γ GF] (a b : Atom) :
     (nFresh γ a ∗ nFresh γ b : IProp GF) ⊢ ⌜a ≠ b⌝ := by
   unfold nFresh
   exact ownFresh_distinct γ a b
@@ -108,7 +108,7 @@ theorem binders_distinct (γ : GName) [HasNameAlloc γ GF Fr] (a b : Atom) :
 /-- **Allocate a fresh binder and bind a nominal term.** From the context
 allocator, allocate `a # Γ`, obtain ownership of it, and form the α-correct
 nominal abstraction `Tm.lam a t`, whose bound name is provably fresh for it. -/
-theorem alloc_and_bind (γ : GName) [HasNameAlloc γ GF Fr] (Γ : Ctx) (S : Ty) (t : Tm) :
+theorem alloc_and_bind (γ : GName) [HasNameAlloc γ GF] (Γ : Ctx) (S : Ty) (t : Tm) :
     ownCtx γ Γ ⊢
       |==> ∃ a : Atom, nFresh γ a ∗ ⌜a ∉ Tm.freeVars (Tm.lam a t)⌝ ∗ ownCtx γ ((a, S) :: Γ) := by
   refine (abs_alloc γ Γ S).trans (BIUpdate.mono ?_)
@@ -117,7 +117,7 @@ theorem alloc_and_bind (γ : GName) [HasNameAlloc γ GF Fr] (Γ : Ctx) (S : Ty) 
   isplitl [Hf]
   · iexact Hf
   · isplit
-    · ipure_intro; exact Tm.bound_not_free a t
+    · ipureintro; exact Tm.bound_not_free a t
     · iexact Hc
 
 end Binding

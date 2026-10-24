@@ -113,8 +113,6 @@ section Allocation
 
 open OFE
 
-variable {F : Type _} [UFraction F]
-
 /-- The **allocation local update**: an unused name `a` may be split off the
 empty fragment, growing the authority from `S` to `S ∪ {a}`. -/
 theorem alloc_localUpdate {S : NameSet} {a : Atom} (h : a ∉ S) :
@@ -123,7 +121,7 @@ theorem alloc_localUpdate {S : NameSet} {a : Atom} (h : a ∉ S) :
   rw [local_update_unital_discrete]
   intro z _ he
   have hz : (DisjointLeibnizSet.valid S) = z :=
-    Leibniz.leibniz.mp (he.trans (UCMRA.unit_left_id (x := z)))
+    he.trans (UCMRA.unit_left_id (x := z))
   subst hz
   refine ⟨trivial, ?_⟩
   have hdisj : ({a} : NameSet) ## S := by
@@ -131,18 +129,18 @@ theorem alloc_localUpdate {S : NameSet} {a : Atom} (h : a ∉ S) :
     exact h
   calc DisjointLeibnizSet.valid (S ∪ {a})
       = DisjointLeibnizSet.valid ({a} ∪ S) := by rw [NameSet.union_comm]
-    _ ≡ (DisjointLeibnizSet.valid ({a} : NameSet)) • (DisjointLeibnizSet.valid S) :=
+    _ = (DisjointLeibnizSet.valid ({a} : NameSet)) • (DisjointLeibnizSet.valid S) :=
         (disj_op_union hdisj).symm
 
-/-- **In-logic name allocation** — the frame-preserving update in `Auth F NameRA`. -/
+/-- **In-logic name allocation** — the frame-preserving update in `Auth NameRA`. -/
 theorem name_alloc {S : NameSet} {a : Atom} (h : a ∉ S) :
-    (Auth.authFull (DisjointLeibnizSet.valid S) : Auth F NameRA) ~~>
-      (Auth.authFull (DisjointLeibnizSet.valid (S ∪ {a}))) • Auth.frag (freshRA a) :=
+    (Auth.auth (DFrac.own 1) (DisjointLeibnizSet.valid S) : Auth NameRA) ~~>
+      (Auth.auth (DFrac.own 1) (DisjointLeibnizSet.valid (S ∪ {a}))) • Auth.frag (freshRA a) :=
   Auth.auth_update_alloc (alloc_localUpdate h)
 
 /-- Validity of two combined fresh fragments encodes distinctness. -/
 theorem frag_freshRA_valid_ne {a b : Atom}
-    (hv : ✓ ((Auth.frag (freshRA a) • Auth.frag (freshRA b)) : Auth F NameRA)) : a ≠ b := by
+    (hv : ✓ ((Auth.frag (freshRA a) • Auth.frag (freshRA b)) : Auth NameRA)) : a ≠ b := by
   rw [← Auth.frag_op] at hv
   refine (freshRA_valid_op_iff a b).mp ?_
   rw [CMRA.valid_iff_validN]
@@ -156,57 +154,54 @@ section Own
 
 open Iris.BI COFE
 
-variable {Fr : Type _} [UFraction Fr]
-variable {GF : BundledGFunctors} [E : ElemG GF (constOF (Auth Fr NameRA))]
+variable {GF : BundledGFunctors} [E : ElemG GF (constOF (Auth NameRA))]
 
 set_option synthInstance.maxHeartbeats 1000000 in
 /-- The authoritative name camera is discrete. -/
-instance nameAuth_discrete : CMRA.Discrete (Auth Fr NameRA) := inferInstance
+instance nameAuth_discrete : CMRA.Discrete (Auth NameRA) := inferInstance
 
 /-- Ghost ownership of the **authoritative** allocated name-set `S` at `γ`. -/
 def ownAuth (γ : GName) (S : NameSet) : IProp GF :=
-  iOwn (GF := GF) (F := constOF (Auth Fr NameRA)) (E := E) γ
-    (Auth.authFull (DisjointLeibnizSet.valid S))
+  iOwn (GF := GF) (F := constOF (Auth NameRA)) (E := E) γ
+    (Auth.auth (DFrac.own 1) (DisjointLeibnizSet.valid S))
 
 /-- Ghost ownership of the **fresh-name fragment** for `a` at `γ`. -/
 def ownFresh (γ : GName) (a : Atom) : IProp GF :=
-  iOwn (GF := GF) (F := constOF (Auth Fr NameRA)) (E := E) γ (Auth.frag (freshRA a))
+  iOwn (GF := GF) (F := constOF (Auth NameRA)) (E := E) γ (Auth.frag (freshRA a))
 
 end Own
 
 /-! ### Points-to notation -/
 
 set_option synthInstance.checkSynthOrder false in
-/-- `GF` carries a name allocator, recovering `GF`/`Fr` from `γ` alone. -/
-class abbrev HasNameAlloc (γ : GName) (GF : outParam BundledGFunctors)
-    (Fr : outParam (Type _)) [UFraction Fr] :=
-  ElemG GF (constOF (Auth Fr NameRA))
+/-- `GF` carries a name allocator, recovering `GF` from `γ` alone. -/
+class abbrev HasNameAlloc (γ : GName) (GF : outParam BundledGFunctors) :=
+  ElemG GF (constOF (Auth NameRA))
 
 /-- Owned authoritative name-set, allocator recovered from `γ`. -/
-def nAuth {Fr : Type _} [UFraction Fr] {GF : BundledGFunctors} (γ : GName)
-    [HasNameAlloc γ GF Fr] (S : NameSet) : IProp GF := ownAuth (Fr := Fr) γ S
+def nAuth {GF : BundledGFunctors} (γ : GName)
+    [HasNameAlloc γ GF] (S : NameSet) : IProp GF := ownAuth γ S
 
 /-- Owned fresh name, allocator recovered from `γ`. -/
-def nFresh {Fr : Type _} [UFraction Fr] {GF : BundledGFunctors} (γ : GName)
-    [HasNameAlloc γ GF Fr] (a : Atom) : IProp GF := ownFresh (Fr := Fr) γ a
+def nFresh {GF : BundledGFunctors} (γ : GName)
+    [HasNameAlloc γ GF] (a : Atom) : IProp GF := ownFresh γ a
 
 @[inherit_doc] scoped notation:55 γ:56 " ⊨auth " S:56 => nAuth γ S
 @[inherit_doc] scoped notation:55 γ:56 " ⊨fresh " a:56 => nFresh γ a
 
 section Own
-variable {Fr : Type _} [UFraction Fr]
-variable {GF : BundledGFunctors} [E : ElemG GF (constOF (Auth Fr NameRA))]
+variable {GF : BundledGFunctors} [E : ElemG GF (constOF (Auth NameRA))]
 
 /-- **`own`-level name allocation** (`iOwn_update ∘ name_alloc`). -/
 theorem own_name_alloc (γ : GName) {S : NameSet} {a : Atom} (h : a ∉ S) :
-    ownAuth (Fr := Fr) (E := E) γ S ⊢
-      |==> (ownAuth (Fr := Fr) (E := E) γ (S ∪ {a}) ∗ ownFresh (Fr := Fr) (E := E) γ a) := by
+    ownAuth (E := E) γ S ⊢
+      |==> (ownAuth (E := E) γ (S ∪ {a}) ∗ ownFresh (E := E) γ a) := by
   unfold ownAuth ownFresh
-  exact (iOwn_update (name_alloc (F := Fr) h)).trans (BIUpdate.mono iOwn_op.1)
+  exact (iOwn_update (name_alloc h)).trans (BIUpdate.mono iOwn_op.1)
 
 /-- **Creating a fresh name allocator** from nothing. -/
 theorem own_name_alloc_init :
-    ⊢ |==> ∃ γ, ownAuth (Fr := Fr) (E := E) γ (∅ : NameSet) := by
+    ⊢ |==> ∃ γ, ownAuth (E := E) γ (∅ : NameSet) := by
   unfold ownAuth
   refine iOwn_alloc _ ?_
   rw [CMRA.valid_iff_validN]
@@ -216,7 +211,7 @@ theorem own_name_alloc_init :
 
 /-- **Two owned fresh names are distinct** — separation forces `a ≠ b`. -/
 theorem ownFresh_distinct (γ : GName) (a b : Atom) :
-    (ownFresh (Fr := Fr) (E := E) γ a ∗ ownFresh (Fr := Fr) (E := E) γ b : IProp GF) ⊢
+    (ownFresh (E := E) γ a ∗ ownFresh (E := E) γ b : IProp GF) ⊢
       ⌜a ≠ b⌝ := by
   unfold ownFresh
   exact iOwn_cmraValid_op.trans
