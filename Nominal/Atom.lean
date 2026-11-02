@@ -82,7 +82,7 @@ theorem offset_pos_of_nonempty {s : Finset Atom} (h : s.Nonempty) :
   simp only [offset, h, ↓reduceDIte]
   omega
 
-/-- Fresh atom: the smallest atom not in the given set -/
+/-- Fresh atom: one above the largest atom of the given set, which is not in that set. -/
 noncomputable def fresh (s : Finset Atom) : Atom :=
   ⟨offset s⟩
 

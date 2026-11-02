@@ -533,12 +533,6 @@ needs a derived eliminator. `NameAbs.lift` is the underlying `Quotient.lift`:
 given an atom-indexed `f : Atom → α → β` that respects the α-equivalence
 relation `AbsRel`, it produces `NameAbs.lift f h : [𝔸]α → β` together with the
 computation (β-)rule `NameAbs.lift f h (abs a x) = f a x`.
-
-`NameAbs.liftFCB` packages the standard *freshness condition for binders*
-(FCB): rather than requiring compatibility on all `AbsRel`-related inputs
-directly, it derives it from equivariance of `f` together with a freshness
-witness `a # f a x` (Pitts' "some atom is fresh for its own image"). This is
-the honest nominal recursor with a genuine freshness side-condition.
 -/
 
 /-- **Nominal elimination principle** (Pitts, Ch. 8). Lift an atom-indexed

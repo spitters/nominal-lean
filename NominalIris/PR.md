@@ -9,16 +9,16 @@ an α-quotient nominal term type. Atoms, name-worlds, and terms live in
 nominal-lean's `Atom` / `FinPerm` / `NomSet`; the Iris layer (`NominalIris.*`) is
 built over those atoms.
 
-The headline law is the nominal analogue of `ℓ₁ ↦ ∗ ℓ₂ ↦ ⊢ ℓ₁ ≠ ℓ₂`:
+`NomProp` is `HeapProp Unit`. The headline law is `ℓ₁ ↦ ∗ ℓ₂ ↦ ⊢ ℓ₁ ≠ ℓ₂` at unit values,
+with locations the atoms' underlying numbers:
 
 ```lean
 theorem freshName_sep_ne (a b : Atom) :
     (freshName a ∗ freshName b : NomProp) ⊢ iprop(⌜a ≠ b⌝)
 ```
 
-and its ghost-state image is that two owned fresh names are distinct
-(`ownFresh_distinct`), which is exactly the well-formedness (distinct binders) of
-a typing context.
+Separately, two owned fresh names of the ghost state are distinct
+(`ownFresh_distinct`).
 
 ## What it adds
 

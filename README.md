@@ -4,8 +4,8 @@
 
 The Gabbay–Pitts theory of names and symmetry in Lean 4: a countable set of
 atoms, finite permutations, nominal sets (finitely-supported permutation
-actions), freshness and the `И` (new) quantifier, support, and name
-abstraction — together with the categorical (Schanuel-topos) layer: the
+actions), freshness, support, and name
+abstraction — together with the categorical layer: the
 category of nominal sets, its symmetric-monoidal and monoidal-closed structure,
 the name-abstraction functor with its binding adjunction and recursion
 principle, and the equivalence with the finitely-supported `FinPerm`-sets.
@@ -27,7 +27,7 @@ the declared namespaces are `CatCrypt.Nominal` and `CatCrypt.Category`.
 ## Build
 
 Requires [elan](https://github.com/leanprover/elan). The pinned toolchain is
-`leanprover/lean4:v4.30.0` (see `lean-toolchain`).
+`leanprover/lean4:v4.35.0` (see `lean-toolchain`).
 
 ```
 lake exe cache get    # pull the Mathlib olean cache
@@ -38,7 +38,8 @@ lake build            # builds Nominal + Nominal.Category
 
 Pinned in `lakefile.lean` and `lake-manifest.json`:
 
-- [Mathlib](https://github.com/leanprover-community/mathlib4) `v4.30.0` — the only dependency.
+- [Mathlib](https://github.com/leanprover-community/mathlib4) `v4.35.0` — the only dependency of the `Nominal` library.
+- [iris-lean](https://github.com/leanprover-community/iris-lean), through the fork `spitters/iris-catcrypt`, tag `v4.35.0-catcrypt.1` — used only by the `NominalIris` library.
 
 ## References
 
