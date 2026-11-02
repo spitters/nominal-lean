@@ -10,7 +10,9 @@ public import Nominal.FinPerm
 public import Nominal.Nominal
 public import Nominal.Fresh
 public import Nominal.Support
+public import Nominal.New
 public import Nominal.NameAbstraction
+public import Nominal.NameAbstractionFCB
 public import Nominal.Lambda
 public import Nominal.LambdaAbs
 

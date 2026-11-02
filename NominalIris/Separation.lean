@@ -9,20 +9,20 @@ public import Iris.ProofMode
 public import Iris.Instances.Classical.Instance
 public import Nominal.Atom
 
-set_option autoImplicit false
-
 /-!
-# Nominal separation as a BI, over nominal `Atom`
+# Atom-indexed assertions in the classical heap BI
 
-The nominal-separation BI (`freshName a ∗ freshName b ⊢ ⌜a ≠ b⌝`) over
-nominal-lean's `Atom`, so it shares the framework with the nominal λ-terms and
-the name camera. The iris-lean classical heap state is `ℕ`-indexed; an atom `a`
-occupies location `a.val` (`Atom ≅ ℕ`), so name-worlds embed faithfully.
+`NomProp` is iris-lean's classical heap BI `HeapProp Unit`; this module adds no BI instance. Its
+state is `ℕ`-indexed, an atom `a` occupies location `a.val` (`Atom ≅ ℕ`), and name-worlds embed
+faithfully (`toNS_injective`). `freshName a` is the exact-ownership assertion `a.val ↦ ()`, so
+`freshName_sep_ne` is the points-to disjointness law of this model at unit values.
 
-Permutation and equivariance for the nominal objects — name-worlds
-(`Finset Atom`) and terms — use nominal-lean's `NomSet` / `FinPerm` action.
-`NomProp` is not itself a nominal set: not every proposition has finite support.
+`NomProp` is not a nominal set: not every proposition has finite support. The permutation action
+on all of `NomProp` and the equivariance of `freshName_sep_ne` are in `NominalIris.Den`
+(`permProp`, `permProp_freshName`, `freshName_sep_ne_perm`).
 -/
+
+set_option autoImplicit false
 
 @[expose] public section
 
@@ -52,7 +52,6 @@ theorem nsUnion_apply (σ₁ σ₂ : NomState) (i : Nat) :
       | .result x, .unknown  => .result x
       | .unknown , .result y => .result y
       | _        , _         => .conflict) := by
-  show Union.union σ₁ σ₂ i = _
   simp only [Union.union]
   cases σ₁ i <;> cases σ₂ i <;> rfl
 
@@ -127,12 +126,13 @@ theorem worldProp_sep {w₁ w₂ : NameWorld} (h : Disjoint w₁ w₂) :
   constructor
   · rintro σ ⟨σ₁, σ₂, hu, _, h1, h2⟩
     subst h1; subst h2
-    show σ = toNS (w₁ ∪ w₂); rw [hu, toNS_union h]
+    change σ = toNS (w₁ ∪ w₂); rw [hu, toNS_union h]
   · rintro σ hσ
     refine ⟨toNS w₁, toNS w₂, ?_, (toNS_disjoint_iff w₁ w₂).mpr h, rfl, rfl⟩
-    show σ = toNS w₁ ∪ toNS w₂; rw [hσ, toNS_union h]
+    change σ = toNS w₁ ∪ toNS w₂; rw [hσ, toNS_union h]
 
-/-- **Headline nominal law.** Two distinct fresh names are separated. -/
+/-- Separately owned fresh names are distinct: the points-to disjointness law at unit values, at
+locations `a.val` and `b.val`. -/
 theorem freshName_sep_ne (a b : Atom) :
     (freshName a ∗ freshName b : NomProp) ⊢ iprop(⌜a ≠ b⌝) := by
   rintro σ ⟨σ₁, σ₂, _, hd, h1, h2⟩

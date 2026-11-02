@@ -4,8 +4,9 @@
 
 The Gabbay–Pitts theory of names and symmetry in Lean 4: a countable set of
 atoms, finite permutations, nominal sets (finitely-supported permutation
-actions), freshness, support, and name
-abstraction — together with the categorical layer: the
+actions), freshness and the `И` (new) quantifier with its some/any theorem,
+support, and name abstraction with the recursor under the freshness condition
+for binders — together with the categorical layer: the
 category of nominal sets, its symmetric-monoidal and monoidal-closed structure,
 the name-abstraction functor with its binding adjunction and recursion
 principle, and the equivalence with the finitely-supported `FinPerm`-sets.
